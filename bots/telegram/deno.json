@@ -1,0 +1,10 @@
+{
+  "deploy": {
+    "project": "71016fc8-a90c-4d22-96f4-7532e98b07f6",
+    "exclude": [
+      "**/node_modules"
+    ],
+    "include": [],
+    "entrypoint": "bot.ts"
+  }
+}
