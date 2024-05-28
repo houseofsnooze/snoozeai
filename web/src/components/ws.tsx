@@ -22,8 +22,19 @@ export default function Ws() {
     const [showNext, setShowNext] = useState(false);
     const [agent, setAgent] = useState("Spec Writer");
 
+    // useEffect(() => {
+    //   let ws = new WebSocket("ws://localhost:8080");
+    //   ws.onopen = function(){
+    //       // Web Socket is connected, send data using send()
+    //       console.log("SUCCESS");
+    //   };
+    // }, []);
+
+    // const ws: any = undefined;
+
     const ws = useMemo(() => new PartySocket({
-        host: "localhost:8080", // or localhost:1999 in dev
+        host: "localhost:8080",
+        // host: "3.131.153.191:8080",
         room: "snooz3-web",
       }), []);
 
