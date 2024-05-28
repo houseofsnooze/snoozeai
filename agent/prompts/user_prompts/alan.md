@@ -1,0 +1,2 @@
+I want to make an ERC721 called Miner and an ERC20 called GOLD. MINER has a max supply of 100. Holding 1 MINER
+for 1 block will earn you 1 GOLD. This is a constant rate of emission. Transfers of MINER will mint the appropriate amount of gold to the sender of the NFT.

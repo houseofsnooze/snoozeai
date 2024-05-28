@@ -1,0 +1,1 @@
+I want an app that allows someone to deposit WETH or USDC and puts their funds into an Aave lending pool. The contract owner can then determine when the person can withdraw their funds which should take them out of Aave and return to the depositor.
