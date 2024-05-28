@@ -1,0 +1,14 @@
+[data-radix-scroll-area-viewport] {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+[data-radix-scroll-area-viewport]::-webkit-scrollbar {
+    display: none;
+}
+
+#chat-screen {
+    --radix-scroll-area-corner-width: 0px;
+    --radix-scroll-area-corner-height: 0px;
+}
