@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@uiw/react-markdown-preview": "^5.1.1",
     "next": "14.2.3",
     "partysocket": "^1.0.1",
     "react": "^18",
