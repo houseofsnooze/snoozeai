@@ -1,36 +1,3 @@
-# import asyncio
-# import websockets
-
-# connected_clients = set()
-# relay_server_uri = "ws://localhost:1337"
-
-# PORT = 8000
-
-# async def relay_messages_to_external_server(websocket, path):
-#     async with websockets.connect(relay_server_uri) as relay_websocket:
-#         # Register new client
-#         connected_clients.add(websocket)
-#         try:
-#             async for message in websocket:
-#                 # Relay message to the external server
-#                 await relay_websocket.send(message)
-#                 # Broadcast received message to all connected clients
-#                 await asyncio.wait([client.send(message) for client in connected_clients if client != websocket])
-
-#         except websockets.ConnectionClosed:
-#             pass
-#         finally:
-#             # Unregister client
-#             connected_clients.remove(websocket)
-
-# async def main():
-#     async with websockets.serve(relay_messages_to_external_server, "0.0.0.0", PORT):
-#         print("WebSocket server running on port", PORT)
-#         await asyncio.Future()  # run forever
-
-# if __name__ == "__main__":
-#     asyncio.run(main())
-
 import asyncio
 import os
 import signal
