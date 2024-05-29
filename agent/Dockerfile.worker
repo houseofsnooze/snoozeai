@@ -1,0 +1,22 @@
+FROM node:20-alpine AS node
+
+FROM python:3.9-alpine
+
+COPY --from=node /usr/lib /usr/lib
+COPY --from=node /usr/local/lib /usr/local/lib
+COPY --from=node /usr/local/include /usr/local/include
+COPY --from=node /usr/local/bin /usr/local/bin
+
+# Verify installations
+RUN python --version && node --version && npm --version
+
+# Copy the current directory contents into the container at /app
+COPY . .
+
+# Install any needed packages specified in requirements.txt and package.json
+# RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
+RUN pip install "uvicorn[standard]" websockets "pyautogen[websockets]"
+RUN npm install --prefix zzz/hh
+
+CMD ["python", "fury.py"]

@@ -9,3 +9,4 @@ zzz/hh/spec*
 zzz/hh/test/*
 zzz/hh/contracts/*
 zzz-test
+.env

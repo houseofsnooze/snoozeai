@@ -1,0 +1,21 @@
+version: "3"
+services:
+  snooze:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    ports:
+      - "8080:8080"
+      - "1337:1337"
+    env_file: .env
+  relay:
+    depends_on:
+      - snooze
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    ports:
+      - "8000:8000"
+    environment:
+      - SNOOZE_URL=ws://host.docker.internal:1337
