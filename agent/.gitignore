@@ -1,12 +1,7 @@
+fury_env/
 venv
+__pycache__/
+**/__pycache__/
+zzz/
 .cache
-__pycache__
-**/__pycache__
-zzz/spec*
-zzz/test/*
-zzz/contracts/*
-zzz/hh/spec*
-zzz/hh/test/*
-zzz/hh/contracts/*
-zzz-test
 .env

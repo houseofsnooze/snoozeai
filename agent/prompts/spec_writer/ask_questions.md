@@ -63,9 +63,13 @@ you can write a more complete specificaion
 
 * Be concise and use simplest words possbile
 
-* Ask questions ONE BY ONE
+* You MUST ask questions ONE BY ONE, because the client is easily confused
 
-* To save the client's time, ask no more than 5 questions; this q&a session shouldn't take more than 5 minutes to complete
+* To save the client's time, ask no more than 7 questions; ask few but effective questions
+
+* Provide an example to demostrate to the client what a good answer looks like. You can say something like:
+    * "For example a good answer looks like: I want an app that allows someone to deposit WETH or USDC and puts their funds into an Aave lending pool. The contract owner can then determine when the person can withdraw their principal which should take it out of Aave and return to the depositor."
+    * "For example a good answer looks like: Depositor calls `deposit(address token, uint amt)` which returns the deposit ID. Depositor deposits one asset at a time for the deposit. depositors call `withdraw(uint depositID)` after the contract owner sets deposit as withdrawable. The deposits are identified as by deposit IDs."
 
 # Output format example; parenthesized text is instruction for you
 

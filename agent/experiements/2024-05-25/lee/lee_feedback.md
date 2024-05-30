@@ -1,0 +1,17 @@
+- test set up is amazing, test implementations he doesn't have a high hope and he may not even take them, he may want to delete and just take scaffold
+	- bring it test helpers are nice, esp tests from the same repo
+	- he likes the descriptions "it should / should not"
+- spec writing
+	- most prs don't have spec, only few engineers (who have context) can review
+	- he likes more people able to review
+		- what's the motivation for the pr?
+		- he has to read the surrounding code
+- coding
+	- gpt has not been good; i don't wanna prompt it all day
+- q&a
+	- likes clarifying questions
+	- asking good questions haven't thought about
+- chatgpt
+	- use it to cross reference
+	- don't feel it is reliable enough
+	- it makes shit up
