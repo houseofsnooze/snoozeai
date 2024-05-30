@@ -1,8 +1,12 @@
+import { load } from "https://deno.land/std@0.224.0/dotenv/mod.ts";
 import { Bot } from "https://deno.land/x/grammy@v1.23.0/mod.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js";
 
 // this is our frontend
 
-const TELEGRAM_BOT_KEY = Deno.env.get("MY_VARIABLE");
+const env = await load();
+
+const TELEGRAM_BOT_KEY = env["TELEGRAM_BOT_KEY"];
 
 type User = {
   id: string;
@@ -101,12 +105,12 @@ function isNewUser(userId: string) {
 
 function startNewContainer(): string {
   // TODO: start new container
-  return "https://localhost:8000";
+  return "ws://localhost:8000";
 }
 
 function restartAgents(): string {
   // TODO: start new container
-  return "https://localhost:8000";
+  return "ws://localhost:8000";
 }
 
 function getUserByRelayUrl(relayUrl: string): User | undefined {
