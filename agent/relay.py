@@ -23,10 +23,11 @@ async def broadcast(message: str, sender: WebSocketServerProtocol):
             await client.send(message)
 
 async def handler(websocket: WebSocketServerProtocol, path: str, upstream_websocket: WebSocketServerProtocol):
+    global upstream_connection_task
     await register(websocket)
     try:
         async for message in websocket:
-            print(f"Server received: {message} from {websocket.remote_address}")
+            print(f"From {websocket.remote_address}: {message}")
             if message == "snooz3-restart":
                 print("Restarting upstream connection...")
                 # Cancel the existing upstream connection task
@@ -51,7 +52,7 @@ async def server(upstream_websocket: WebSocketServerProtocol):
 async def upstream_handler(websocket: WebSocketServerProtocol):
     try:
         async for message in websocket:
-            print(f"Server received: {message} from {websocket.remote_address}")
+            print(f"From {websocket.remote_address}: {message}")
             await broadcast(message, None)
     except websockets.ConnectionClosed:
         print("Upstream server connection closed")
@@ -60,6 +61,7 @@ async def connect_to_upstream():
     try:
         async with websockets.connect(os.environ.get("SNOOZE_URL", "ws://0.0.0.0:1337"), ping_interval=KEEPALIVE_INTERVAL, ping_timeout=PING_TIMEOUT) as websocket:
             print("Connected to snooze websocket server")
+            await websocket.send("start")
             upstream_task = asyncio.create_task(upstream_handler(websocket))
             server_task = asyncio.create_task(server(websocket))
             await asyncio.gather(upstream_task, server_task)
