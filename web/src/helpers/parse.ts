@@ -71,5 +71,5 @@ export function checkAgentMessage(message: string) {
     }
 
 export function isFirstCharAlphanumeric(input: string) {
-    return /^[a-zA-Z0-9]/.test(input);
+    return /^[a-zA-Z0-9#`]/.test(input);
 }
