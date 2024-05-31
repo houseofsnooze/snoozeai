@@ -40,25 +40,31 @@ export function includesToClient(message: string) {
 
 const AGENTS = {
     "Spec_Writer": "done with spec",
-    "User_Rep": "proceed",
-    "User Rep": "proceed",
+    "Client_Rep": "proceed",
+    "Client Rep": "proceed",
     "Contract_Writer": "done with contract",
     "Contract_Reviewer": "done with review",
     "Test_Writer": "done writing tests",
     "Test_Reviewer": "done reviewing tests",
+    "Test_Fixer": "done fixing tests",
     "Spec Writer": "done with spec",
     "Contract Writer": "done with contract",
     "Contract Reviewer": "done with review",
     "Test Writer": "done writing tests",
+    "Test Fixer": "done fixing tests",
     "Test Reviewer": "done reviewing tests",
 }
 
-export function checkAgentMessage(message: string) {
+export function checkAgentMessage(msg: string) {
+    console.log("snz3 - checkAgentMessage");
+        const message = removeAnsiCodes(msg);
         const AGENTS_KEYS = Object.keys(AGENTS);
         let agent;
 
+
         for (let key of AGENTS_KEYS) {
-            if (message.includes(key)) {
+            const checkThis = key + " (to";
+            if (message.includes(checkThis)) {
                 agent = key;
                 break;
             }
@@ -72,4 +78,9 @@ export function checkAgentMessage(message: string) {
 
 export function isFirstCharAlphanumeric(input: string) {
     return /^[a-zA-Z0-9#`]/.test(input);
+}
+
+export function removeAnsiCodes(input: string) {
+    const ansiEscapeCodePattern = /\u001b\[[0-9;]*m/g;
+    return input.replace(ansiEscapeCodePattern, '');
 }

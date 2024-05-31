@@ -11,14 +11,16 @@ import * as parse from "../helpers/parse";
 
 const messageQueue: string[] = [];
 const sentMessages: string[] = [];
+let currentAgent: string = "Spec Writer";
 
 export default function Ws() {
     const [messageList, setMessageList] = useState<MT[]>([]);
     const [inputValue, setInputValue] = useState("");
     const [loading, setLoading] = useState(false);
-    const [currentAgent, setCurrentAgent] = useState("");
+    // const [currentAgent, setCurrentAgent] = useState("Spec Writer");
     const [showNext, setShowNext] = useState(false);
     const [showStart, setShowStart] = useState(true);
+    const [doneWithSpec, setDoneWithSpec] = useState(false);
     const [done, setDone] = useState(false);
     const [reset, setReset] = useState(false);
 
@@ -57,7 +59,34 @@ export default function Ws() {
 
     function onMessage(e: MessageEvent) {
         console.log("received", e.data);
+        console.log("current agent", currentAgent);
         if (!e.data) {
+            return;
+        }
+
+        
+        const { fromAgent, agent } = parse.checkAgentMessage(e.data);
+                if (fromAgent) {
+                    console.log("prev agent", currentAgent, "next agent", agent);
+                    currentAgent = agent;
+                }
+
+        if (e.data.includes("```javascript") && 
+            e.data.includes("const { expect }")
+        ) {
+        const message = e.data.trim();
+        displayMessage({ fromUser: false, message });
+        return;
+        }
+
+        if (e.data.includes("```solidity") &&  e.data.includes("pragma solidity ^0.8.0;")) {
+            const message = e.data.trim();
+            displayMessage({ fromUser: false, message });
+            return;
+        }
+
+        if (e.data.includes("Please give feedback to Client Rep. Press enter or type 'exit' to stop the conversation:")) {
+            setDone(true);
             return;
         }
 
@@ -77,6 +106,7 @@ export default function Ws() {
 
         if (!parse.isFirstCharAlphanumeric(e.data)) {
             // ignore
+            console.log(e.data);
             console.log("snz3 - not alphanumeric");
             return;
         } else {
@@ -87,7 +117,7 @@ export default function Ws() {
                 return;
             }
 
-            if (message == "start") {
+            if (message == "start from the top") {
                 // ignore
                 return;
             }
@@ -117,8 +147,7 @@ export default function Ws() {
 
             if (parse.startsWithProvideFeeback(message)) {
                 // first, check last message
-                const { fromAgent, agent } = parse.checkAgentMessage(message);
-                setCurrentAgent(agent);
+                
                 if (lastMessage) {
                     if (parse.startsWithArguments(lastMessage)) {
                         // skip and don't display
@@ -136,6 +165,7 @@ export default function Ws() {
             }
 
             displayMessage({ fromUser: false, message });
+            return;
         }
     }
 
@@ -159,6 +189,9 @@ export default function Ws() {
     }
 
     function displayMessage(message: MT) {
+        if (message.message.includes("# User story")) {
+            setDoneWithSpec(true);
+        }
         const lastMessageInList = messageList[messageList.length - 1];
         if (lastMessageInList) {
             console.log("first", message.message);
@@ -181,7 +214,7 @@ export default function Ws() {
     }
 
     function proceedToNextAgent() {
-        setShowNext(false);
+        setDoneWithSpec(false);
         setLoading(true);
         send("exit");
         if (currentAgent.includes("Test") && currentAgent.includes("Reviewer")) {
@@ -201,8 +234,8 @@ export default function Ws() {
         setReset(true);
     }
 
-    function start() {
-        send("start");
+    function handleStart() {
+        send("start from the top");
         setShowStart(false);
     }
 
@@ -213,6 +246,7 @@ export default function Ws() {
     }
 
     function agentAvailable() {
+        // return true;
         return currentAgent.includes("Spec") || currentAgent.includes("Reviewer");
     }
 
@@ -222,17 +256,17 @@ export default function Ws() {
                     <Message key={index} message={message.message} fromUser={message.fromUser} />
                 ))}
             {done && (
-                <div className="text-lg font-normal h-8 rounded-md px-3 text-xs text-center">
+        <h2 className="scroll-m-20 pb-2 text-3xl tracking-tight first:mt-0 text-gray-400">
                     {"Done! Now you can catch some zzzs 😴"}
-                </div>
+                </h2>
             )}
-            {showStart && (
+            {!done && showStart && (
                 <div className="flex justify-center">
                     <button onClick={restart} className="focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-8 rounded-md px-3 text-xs">
                             <svg style={{ color: "slategray" }} xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  strokeWidth="1.5"  strokeLinecap="round"  strokeLinejoin="round"  className="icon icon-tabler icons-tabler-outline icon-tabler-trash"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>
                             </button>
                 <button
-                                onClick={start}
+                                onClick={handleStart}
                                 className="text-black font-bold w-[150px] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 shadow-md shadow-yellow-600/50 text-primary-foreground shadow hover:bg-primary/90 h-8 rounded-md px-3 text-xs"
                                 style={{ backgroundColor: "rgb(213, 234, 23)" }}
                                 >Start</button>
@@ -253,7 +287,7 @@ export default function Ws() {
                                 <button
                                 onClick={handleEnter}
                                 className="text-black font-bold flex-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 shadow-md shadow-yellow-600/50 text-primary-foreground shadow hover:bg-primary/90 h-8 rounded-md px-3 text-xs"
-                                style={{ backgroundColor: "rgb(213, 234, 23)" }}
+                                style={{ backgroundColor: doneWithSpec ? "gray" : "rgb(213, 234, 23)" }}
                                 >
                                     {loading ? (
                                     <svg className="w-full animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -262,7 +296,21 @@ export default function Ws() {
                                 </svg>
                                     ): "Send"}
                                 </button>
-                            
+                                {doneWithSpec && (
+                                    
+                                <button
+                                onClick={proceedToNextAgent}
+                                className="text-black ml-4 font-bold flex-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 shadow-md shadow-yellow-600/50 text-primary-foreground shadow hover:bg-primary/90 h-8 rounded-md px-3 text-xs"
+                                style={{ backgroundColor: "rgb(213, 234, 23)" }}
+                                >
+                                    {loading ? (
+                                    <svg className="w-full animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                    ): "Done with spec"}
+                                </button>
+                                )}
                             {showNext && (
                                 <button onClick={proceedToNextAgent} className="ml-auto focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-8 rounded-md px-3 text-xs">
                                     <svg style={{ color: "slategray" }}  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  strokeWidth="1.5"  strokeLinecap="round"  strokeLinejoin="round"  className="icon icon-tabler icons-tabler-outline icon-tabler-player-track-next"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 5v14l8 -7z" /><path d="M14 5v14l8 -7z" /></svg>
@@ -274,7 +322,7 @@ export default function Ws() {
                                 disabled
                                 className="text-black font-bold flex-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 shadow-md shadow-yellow-600/50 text-primary-foreground shadow hover:bg-primary/90 h-8 rounded-md px-3 text-xs"
                                 style={{ backgroundColor: "rgb(213, 234, 23)" }}
-                                >Zzz is working hard so you don't have to 😴</button>
+                                >Zzz works hard so you can sleep 😴</button>
                             )}
                         </div>
                     </div>
