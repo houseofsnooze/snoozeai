@@ -40,6 +40,8 @@ export function includesToClient(message: string) {
 
 const AGENTS = {
     "Spec_Writer": "done with spec",
+    "User_Rep": "proceed",
+    "User Rep": "proceed",
     "Contract_Writer": "done with contract",
     "Contract_Reviewer": "done with review",
     "Test_Writer": "done writing tests",

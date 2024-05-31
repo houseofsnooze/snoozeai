@@ -6,12 +6,12 @@ interface MessageProps {
     fromUser: boolean;
 }
 
-const wrapperClasses = "flex flex-col items-start gap-2 rounded-lg p-1 mb-4 text-left text-sm transition-all hover:bg-accent"
+const wrapperClasses = "flex flex-col items-start gap-2 rounded-lg p-1 mb-4 text-left text-sm transition-all hover:bg-accent max-w-xl"
 
 export default function Message({ name, message, fromUser }: MessageProps) {
     return (
         <div
-            className={fromUser ? wrapperClasses + " ml-auto bg-blue-800/50 shadow-md shadow-yellow-600/50" : wrapperClasses}
+            className={fromUser ? wrapperClasses + " ml-auto bg-[#d5ea17] shadow-md shadow-yellow-600/50 text-black" : wrapperClasses}
         >
             <div className="flex w-full flex-col gap-1">
                 <div className="flex items-center">

@@ -9,19 +9,6 @@ import { Message as MT } from "../helpers/types";
 
 import * as parse from "../helpers/parse";
 
-const AGENTS: Record<string, string> = {
-    "Spec_Writer": "done with spec",
-    "Contract_Writer": "done with contract",
-    "Contract_Reviewer": "done with review",
-    "Test_Writer": "done writing tests",
-    "Test_Reviewer": "done reviewing tests",
-    "Spec Writer": "done with spec",
-    "Contract Writer": "done with contract",
-    "Contract Reviewer": "done with review",
-    "Test Writer": "done writing tests",
-    "Test Reviewer": "done reviewing tests",
-}
-
 const messageQueue: string[] = [];
 const sentMessages: string[] = [];
 
@@ -188,7 +175,7 @@ export default function Ws() {
     }
 
     return (
-        <div className="grid gap-4">
+        <div className="grid gap-4 max-w-5xl w-[100%]">
                 {messageList.map((message, index) => (
                     <Message key={index} message={message.message} fromUser={message.fromUser} />
                 ))}
