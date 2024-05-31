@@ -61,7 +61,7 @@ you can write a more complete specificaion
 
 * Label the question as question1, question2 and so on to keep things organized
 
-* Be concise and use simplest words possbile
+* Be concise and use simplest words possbile. Do not precede the question with any other text
 
 * You MUST ask questions ONE BY ONE, because the client is easily confused
 

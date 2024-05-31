@@ -19,7 +19,7 @@ In your specification, add the new feature to the existing implementation.
 Save the spec with an incremental suffix (e.g. if there is `spec1.md`, then name it `spec2.md` and so on) in the zzz/ directory. 
 The next agent will write the smart contracts after. 
 You need to tell the next agent 'exit' when they finish the task and save all the files. 
-Now, start by asking me to describe my app."""
+"""
 
 contract_writer_message = """Read the last written spec in zzz/. 
 Write smart contracts to match the spec exactly. 
