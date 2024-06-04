@@ -19,12 +19,12 @@ export const LogoBlock = () => {
                     data-border="true"
                     data-framer-name="Tablet"
                     style={{
-                        "--border-bottom-width": "2px",
-                        "--border-color": "var(--token-e963b8ae-02ac-4e93-b75a-f86ceff4c8c2, rgb(25, 29, 22))",
-                        "--border-left-width": "2px",
-                        "--border-right-width": "2px",
-                        "--border-style": "solid",
-                        "--border-top-width": "2px",
+                        borderBottomWidth: "2px",
+                        borderColor: "var(--token-e963b8ae-02ac-4e93-b75a-f86ceff4c8c2, rgb(25, 29, 22))",
+                        borderLeftWidth: "2px",
+                        borderRightWidth: "2px",
+                        borderStyle: "solid",
+                        borderTopWidth: "2px",
                         backgroundColor: "var(--token-99351878-363a-47b2-9a3c-6acaef70a562, rgb(137, 251, 131))",
                         height: "100%",
                         width: "100%",
@@ -117,24 +117,24 @@ export const LogoBlock = () => {
                             flexDirection: "column",
                             justifyContent: "flex-start",
                             flexShrink: 0,
-                            "--extracted-r6o4lv": "hsl(0, 0%, 0%)",
-                            "--framer-link-text-color": "rgb(0, 153, 255)",
-                            "--framer-link-text-decoration": "underline",
-                            "--framer-paragraph-spacing": "0px",
+                            // "--extracted-r6o4lv": "hsl(0, 0%, 0%)",
+                            // "--framer-link-text-color": "rgb(0, 153, 255)",
+                            // "--framer-link-text-decoration": "underline",
+                            // "--framer-paragraph-spacing": "0px",
                             transform: "none",
                             opacity: 1
                         }}
                         data-framer-component-type="RichTextContainer">
                         <p style={{
-                            "--font-selector": "SW50ZXI=",
-                            "--framer-font-family": "'Inter', sans-serif",
-                            "--framer-font-size": "16px",
-                            "--framer-font-style": "normal",
-                            "--framer-font-weight": 400,
-                            "--framer-letter-spacing": "0em",
-                            "--framer-line-height": "1.2em",
-                            "--framer-text-alignment": "start",
-                            "--framer-text-color": "var(--extracted-r6o4lv)"
+                            // "--font-selector": "SW50ZXI=",
+                            // "--framer-font-family": "'Inter', sans-serif",
+                            // "--framer-font-size": "16px",
+                            // "--framer-font-style": "normal",
+                            // "--framer-font-weight": 400,
+                            // "--framer-letter-spacing": "0em",
+                            // "--framer-line-height": "1.2em",
+                            // "--framer-text-alignment": "start",
+                            // "--framer-text-color": "var(--extracted-r6o4lv)"
                         }} className="framer-text">
                             <br className="framer-text trailing-break" />
                         </p>

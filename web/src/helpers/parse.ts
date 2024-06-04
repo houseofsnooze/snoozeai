@@ -40,6 +40,7 @@ export function includesToClient(message: string) {
 
 const AGENTS = {
     "Spec_Writer": "done with spec",
+    "Client": "hmm...",
     "Client_Rep": "proceed",
     "Client Rep": "proceed",
     "Contract_Writer": "done with contract",
@@ -57,24 +58,24 @@ const AGENTS = {
 
 export function checkAgentMessage(msg: string) {
     console.log("snz3 - checkAgentMessage");
-        const message = removeAnsiCodes(msg);
-        const AGENTS_KEYS = Object.keys(AGENTS);
-        let agent;
+    const message = removeAnsiCodes(msg);
+    const AGENTS_KEYS = Object.keys(AGENTS);
+    let agent;
 
 
-        for (let key of AGENTS_KEYS) {
-            const checkThis = key + " (to";
-            if (message.includes(checkThis)) {
-                agent = key;
-                break;
-            }
-        }
-        if (agent) {
-            return { fromAgent: true, agent: agent };
-        } else {
-            return { fromAgent: false, agent: "" };
+    for (let key of AGENTS_KEYS) {
+        const checkThis = key + " (to";
+        if (message.includes(checkThis)) {
+            agent = key;
+            break;
         }
     }
+    if (agent) {
+        return { fromAgent: true, agent: agent };
+    } else {
+        return { fromAgent: false, agent: "" };
+    }
+}
 
 export function isFirstCharAlphanumeric(input: string) {
     return /^[a-zA-Z0-9#`]/.test(input);
