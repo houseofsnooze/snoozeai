@@ -18,4 +18,3 @@ Your task is to write comprehensive test cases with both unit tests and behavior
 
 * Write test cases that cover vulnerabilities, attack vectors and edge cases.
 * Always test that balances change correctly for addresses and contracts.
-

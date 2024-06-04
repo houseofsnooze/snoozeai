@@ -10,7 +10,8 @@ COPY --from=node /usr/local/bin /usr/local/bin
 # Verify installations
 RUN python --version && node --version && npm --version
 
-# Copy the current directory contents into the container at /app
+RUN apk --no-cache add curl
+
 COPY . .
 
 # Install any needed packages specified in requirements.txt and package.json
@@ -19,4 +20,7 @@ RUN pip install -r requirements.txt
 RUN pip install "uvicorn[standard]" websockets "pyautogen[websockets]"
 RUN npm install --prefix zzz-template
 
-CMD ["python", "snooz3.py"]
+EXPOSE 8080
+EXPOSE 1337
+
+CMD ["python", "main.py"]

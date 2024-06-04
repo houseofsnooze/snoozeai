@@ -37,7 +37,7 @@ You will be provided:
 
 ## Error: not passing msg.sender to the base constructor Ownable(...)
 
-**Ownable from Openzeppelin should be passed `msg.sender` i.e. `Ownable(msg.sender)`.**
+**Ownable from Openzeppelin should ALWAYS be passed `msg.sender` i.e. `Ownable(msg.sender)`.**
 
 ## Error: `_setupDecimals` is undeclared identifier
 
@@ -52,7 +52,6 @@ stderr: DeclarationError: Undeclared identifier.
   Your solution should be to remove this call. 
 
   In Openzeppelin v5, you need to override the `decimals` method to have custom decimals and **do not call `_setupDecimals`**.
-
 
 ## Rule: do not replace configuration files
 
