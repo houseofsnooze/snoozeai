@@ -1,9 +1,24 @@
+'use client';
+
 import Image from "next/image";
 import Ws from "../components/ws";
 import MessageContainer from "../components/MessageContainer";
 import { LogoBlock } from "../components/LogoBlock";
+import { useRef, useState } from "react";
 
 export default function Home() {
+  const [websocketUrl, setWebsocketUrl] = useState("");
+  const [start, setStart] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const websocketUrlRef = useRef<HTMLInputElement>(null);
+
+  function handleEnterUrl() {
+    setLoading(true);
+    setWebsocketUrl(websocketUrlRef.current?.value || "127.0.0.1:8000");
+    setStart(true);
+  }
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 max-w-5xl items-center justify-between font-mono text-sm lg:flex">
@@ -35,6 +50,23 @@ export default function Home() {
         <h2 className="scroll-m-20 pb-2 text-3xl tracking-tight first:mt-0 text-gray-400">
           {"You want to launch on mainnet but you don't want to mess it up."} <b style={{ color: "rgb(213, 234, 23)" }}>Snooze</b> {"turns your wildest ideas into smart contracts then tests them rigorously so you are ready for deployment."}
         </h2>
+      </div>
+      <div className="flex items-center space-x-2">
+        <div className="grid gap-2">
+          <input ref={websocketUrlRef} className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 lg:w-[300px]" placeholder="Enter agent address..." type="text" />
+          <button
+            onClick={handleEnterUrl}
+            className="text-black inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2"
+            style={{ backgroundColor: "rgb(213, 234, 23)" }}
+          >
+            {loading ? (
+                                                <svg className="w-full animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                            ) : "Start"}
+          </button>
+        </div>
       </div>
 
       {/* <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
@@ -106,7 +138,7 @@ export default function Home() {
           </p>
         </a>
       </div> */}
-      <Ws />
+      {start && <Ws websocketUrl={websocketUrl} started={() => setLoading(false)} />}
     </main>
   );
 }

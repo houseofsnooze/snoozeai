@@ -14,7 +14,7 @@ const sentMessages: string[] = [];
 let currentAgent: string = "Spec Writer";
 const seenAgents = new Set<string>();
 
-export default function Ws() {
+export default function Ws({ websocketUrl, started }: { websocketUrl?: string, started: () => void }) {
     const [messageList, setMessageList] = useState<MT[]>([]);
     const [inputValue, setInputValue] = useState("");
     const [loading, setLoading] = useState(false);
@@ -30,7 +30,8 @@ export default function Ws() {
     useEffect(() => {
         if (!ws.current) {
             ws.current = new PartySocket({
-                host: "127.0.0.1:8000",
+                protocol: "ws",
+                host: websocketUrl || "127.0.0.1:8000",
                 room: "snooz3-web",
             });
             ws.current.onopen = onOpen;
@@ -48,6 +49,7 @@ export default function Ws() {
 
     function onOpen() {
         setLoading(false);
+        started();
         console.log("connected");
         if (reset) {
             console.log("was reset");
@@ -267,7 +269,7 @@ export default function Ws() {
                     {"Done! Now you can catch some zzzs 😴"}
                 </h2>
             )}
-            {!done && showStart && (
+            {/* {!done && showStart && (
                 <div className="flex justify-center">
                     <button onClick={restart} className="focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-8 rounded-md px-3 text-xs">
                         <svg style={{ color: "slategray" }} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-trash"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>
@@ -279,10 +281,10 @@ export default function Ws() {
                     >Start</button>
                 </div>
 
-            )}
+            )} */}
             <div className="ml-auto min-w-[300px] w-1/3">
 
-                <div className={"grid gap-4" + ((done || showStart) ? " hidden" : "")}>
+                <div className={"grid gap-4" + ((done) ? " hidden" : "")}>
                     <textarea value={inputValue} onChange={(e) => setInputValue(e.target.value)} className="flex min-h-[60px] w-full rounded-md border border-input border-gray-700 bg-transparent text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 p-4" placeholder={messageList.length == 0 ? "What contracts do you want for your project?" : "Enter a reply..."}></textarea>
                     <div className="flex items-center">
                         <div className="w-full inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors ml-auto">
