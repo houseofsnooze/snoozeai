@@ -30,7 +30,7 @@ export default function Ws({ websocketUrl, started }: { websocketUrl?: string, s
     useEffect(() => {
         if (!ws.current) {
             ws.current = new PartySocket({
-                protocol: "wss",
+                // protocol: "wss",
                 host: websocketUrl || "127.0.0.1:8000",
                 room: "snooz3-web",
             });
