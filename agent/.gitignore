@@ -5,3 +5,9 @@ __pycache__/
 zzz/
 .cache
 .env
+
+cert.pem
+key.pem
+server.key
+server.csr
+server.crt

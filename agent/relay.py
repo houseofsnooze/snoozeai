@@ -1,6 +1,9 @@
 import asyncio
+from aiohttp import web
+import logging
 import os
 import signal
+import ssl
 import websockets
 from websockets import WebSocketServerProtocol
 
@@ -74,6 +77,21 @@ async def connect_to_upstream():
     except Exception as e:
         print(f"Failed to connect to upstream server: {e}")
 
+# Use http server to handle load balancer healthchecks
+
+async def http_handler(request):
+    return web.Response(text="hello")
+
+async def start_http_server():
+    app = web.Application()
+    app.router.add_get('/', http_handler)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, '0.0.0.0', 3333)
+    await site.start()
+    print("HTTP server running on port 3333")
+    await asyncio.Future()  # Run forever
+
 async def main():
     global upstream_connection_task
     # Create a task for connecting to the upstream server
@@ -89,6 +107,9 @@ async def main():
     loop = asyncio.get_running_loop()
     loop.add_signal_handler(signal.SIGINT, signal_handler)
     loop.add_signal_handler(signal.SIGTERM, signal_handler)
+
+    # Start the HTTP server
+    http_server_task = asyncio.create_task(start_http_server())
     
     await stop_event.wait()
 
@@ -101,6 +122,13 @@ async def main():
 
     # Close all connected clients
     await asyncio.gather(*(client.close() for client in connected_clients))
+
+     # Cancel the HTTP server task
+    http_server_task.cancel()
+    try:
+        await http_server_task
+    except asyncio.CancelledError:
+        print("HTTP server task cancelled")
 
 if __name__ == "__main__":
     asyncio.run(main())
