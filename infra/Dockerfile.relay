@@ -1,0 +1,16 @@
+FROM node:20-alpine AS node
+
+RUN apk --no-cache add curl
+
+WORKDIR /app
+
+COPY package.json package-lock.json relay.ts startAgentSession.ts tsconfig.json .
+
+# Install any needed packages specified in requirements.txt and package.json
+# RUN pip install --no-cache-dir -r requirements.txt
+RUN npm install
+
+EXPOSE 8000
+EXPOSE 3333
+
+CMD ["npx", "ts-node", "relay.ts"]
