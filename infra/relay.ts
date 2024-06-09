@@ -52,7 +52,7 @@ function main() {
         const { wsUrl, taskId } = session;
         // let wsUrl = "ws://host.docker.internal:1337";
         // let taskId = 0;
-        await connectToAgent(wsUrl);
+        connectToAgent(wsUrl);
         res.send({ taskId, wsUrl });
         return;
     });
@@ -89,8 +89,10 @@ async function handleClientConnection (websocket: Socket) {
             const agentWs = connectedAgents.get(agentWsUrl);
             if (!agentWs) {
                 console.error('Agent websocket not found', agentWsUrl);
-                websocket.send('snooz3-pair-error agent-not-found');
-                return;
+                if (!connectToAgent(agentWsUrl)) {
+                    websocket.send('snooz3-pair-error agent-not-found');
+                    return;
+                }
             }
             // pair
             clientToAgent.set(clientWsUrl, agentWsUrl);
@@ -115,7 +117,6 @@ async function handleClientConnection (websocket: Socket) {
                 return;
             }
             agentWs.send(message);
-            console.log(agentWs);
             console.log("Sent message to agent", agentWsUrl);
         }
     });
@@ -162,4 +163,5 @@ function connectToAgent (wsUrl: string) {
     agentWebSocket.onclose = () => handleClose(wsUrl);
 
     connectedAgents.set(wsUrl, agentWebSocket);
+    return true;
 };
