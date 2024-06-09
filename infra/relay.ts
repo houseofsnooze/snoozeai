@@ -89,6 +89,7 @@ async function handleClientConnection (websocket: Socket) {
             const agentWs = connectedAgents.get(agentWsUrl);
             if (!agentWs) {
                 console.error('Agent websocket not found', agentWsUrl);
+                // TODO: update this to send an error if the connection fails
                 if (!connectToAgent(agentWsUrl)) {
                     websocket.send('snooz3-pair-error agent-not-found');
                     return;
