@@ -1,5 +1,6 @@
 zzz
 venv
 .env
-docker-compose.yml
+.cache
+docker-compose*
 Dockerfile*
