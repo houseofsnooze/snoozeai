@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter as FontSans } from "next/font/google";
+import { cn } from "@/lib/utils";
+import { ThemeProvider } from "@/components/ThemeProvider";
+
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const fontSans = FontSans({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "snooz3",
-  description: "AI Solidity smart contract writer",
+  title: "Snooze",
+  description: "AI web3 developer",
 };
 
 export default function RootLayout({
@@ -15,8 +18,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang="en" className="dark" style={{ colorScheme: "dark" }}>
+      <body className={cn(
+        "min-h-screen",
+        fontSans.className
+      )}>
+          {children}
+      </body>
     </html>
   );
 }
