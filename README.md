@@ -44,6 +44,7 @@ cd snoozeai/agent
 docker buildx build -t snooze-main --platform linux/amd64 -f Dockerfile.main . 
 ID=$(docker images --filter=reference=snooze-main --format "{{.ID}}")
 docker tag $ID 084782361886.dkr.ecr.us-east-2.amazonaws.com/snooz3-dev:main
+aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 084782361886.dkr.ecr.us-east-2.amazonaws.com
 docker push 084782361886.dkr.ecr.us-east-2.amazonaws.com/snooz3-dev:main
 ```
 
@@ -53,6 +54,7 @@ cd snoozeai/infra
 docker buildx build -t snooze-relay-ts --platform linux/amd64 -f Dockerfile.relay . 
 ID=$(docker images --filter=reference=snooze-relay-ts --format "{{.ID}}")
 docker tag $ID 084782361886.dkr.ecr.us-east-2.amazonaws.com/snooz3-dev:relay-ts
+aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 084782361886.dkr.ecr.us-east-2.amazonaws.com
 docker push 084782361886.dkr.ecr.us-east-2.amazonaws.com/snooz3-dev:relay-ts
 ```
 
