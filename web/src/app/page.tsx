@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { CENTRAL_RELAY_URL, SNOOZE_AGENT_URL_KEY, SNOOZE_RELAY_URL_KEY } from "../helpers/constants";
 import NotificationTicker from "../components/NotificationTicker";
-import Home from "../components/Home";
-import Ws from "../components/ws";
+import Home from "../screens/Home";
+import Chat from "../screens/Chat";
 
 export default function Main() {
   const [loading, setLoading] = useState(false);
@@ -70,7 +70,7 @@ export default function Main() {
     <div className="h-[100vh] flex justify-between flex-col">
       <main className="flex h-[100vh] flex-col items-center justify-center">
         {!running && <Home setupSession={setupSession} />}
-        {running && <Ws relayAddress={relayAddress} agentAddress={agentAddress} />}
+        {running && <Chat relayAddress={relayAddress} agentAddress={agentAddress} />}
       </main>
       {loading && !running && (<NotificationTicker notification={`Starting your AI agent session. ${countdown} seconds remain. Please keep this page open.`} />)}
     </div>

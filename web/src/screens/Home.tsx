@@ -1,4 +1,4 @@
-import HomeButtons from "./HomeButtons";
+import HomeButtons from "../components/HomeButtons";
 
 interface HomeProps {
     setupSession: (addresses?: { relayAddress: string, agentAddress: string }) => void;

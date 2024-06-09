@@ -2,32 +2,33 @@
 
 import { PartySocket } from "partysocket";
 import { ErrorEvent } from "partysocket/ws";
-import { useEffect, useMemo, useRef, useState } from "react";
-import Message from "./Message";
+import { useEffect, useRef, useState } from "react";
+import Message from "../components/Message";
 import { Message as MT } from "../helpers/types";
 import { Socket, io } from "socket.io-client";
 
-import ButtonNext from "./ButtonNext";
-import ButtonSend from "./ButtonSend";
-import ButtonTrash from "./ButtonTrash";
+import ButtonNext from "../components/ButtonNext";
+import ButtonSend from "../components/ButtonSend";
+import ButtonTrash from "../components/ButtonTrash";
 
 import * as parse from "../helpers/parse";
-import { SNOOZE_AGENT_URL_KEY, SNOOZE_RELAY_URL_KEY } from "../helpers/constants";
-import Tooltip from "./Tooltip";
+import Tooltip from "../components/Tooltip";
+import { Input } from "@/components/ui/input";
+import InputExpandable from "@/components/InputExpandable";
+import { Label } from "@/components/ui/label";
 
 const messageQueue: string[] = [];
 const sentMessages: string[] = [];
 let currentAgent: string = "Spec Writer";
 const seenAgents = new Set<string>();
 
-interface WsProps {
+interface ChatProps {
     relayAddress: string;
     agentAddress: string;
 }
 
-export default function Ws({ relayAddress, agentAddress }: WsProps) {
+export default function Chat({ relayAddress, agentAddress }: ChatProps) {
     const [messageList, setMessageList] = useState<MT[]>([]);
-    const [inputValue, setInputValue] = useState("");
     const [loading, setLoading] = useState(true);
     const [ready, setReady] = useState(false);
     const [error, setError] = useState(false);
@@ -38,6 +39,7 @@ export default function Ws({ relayAddress, agentAddress }: WsProps) {
     const [reset, setReset] = useState(false);
 
     const ws = useRef<Socket | null>(null);
+    const inputRef = useRef<HTMLSpanElement | null>(null);
 
     useEffect(() => {
         if (!ws.current) {
@@ -237,9 +239,12 @@ export default function Ws({ relayAddress, agentAddress }: WsProps) {
     function handleEnter() {
         console.log("snz3 - handle enter");
         setLoading(true);
-        setMessageList(prev => [...prev, { fromUser: true, message: inputValue }]);
-        send(inputValue);
-        setInputValue("");
+        const message = inputRef.current?.innerText || "";
+        setMessageList(prev => [...prev, { fromUser: true, message }]);
+        send(message);
+        if (inputRef.current) {
+            inputRef.current.innerText = "";
+        }
     }
 
     function proceedToNextAgent() {
@@ -254,7 +259,9 @@ export default function Ws({ relayAddress, agentAddress }: WsProps) {
     function restart() {
         send("snooz3-restart");
         setMessageList([]);
-        setInputValue("");
+        if (inputRef.current) {
+            inputRef.current.innerText = "";
+        }
         setLoading(true);
         setDone(false);
         messageQueue.length = 0;
@@ -274,7 +281,7 @@ export default function Ws({ relayAddress, agentAddress }: WsProps) {
     }
 
     return (
-        <div className="grid gap-4 max-w-5xl w-[100%] p-10">
+        <div className="grid gap-4 max-w-5xl w-[100%] p-10 overflow-y-scroll">
             {messageList.map((message, index) => (
                 <Message key={index} message={message.message} fromUser={message.fromUser} />
             ))}
@@ -285,7 +292,10 @@ export default function Ws({ relayAddress, agentAddress }: WsProps) {
             )}
             <div className="ml-auto min-w-[300px] w-1/3">
                 <div className={"grid gap-4" + ((done) ? " hidden" : "")}>
-                    <textarea value={inputValue} onChange={(e) => setInputValue(e.target.value)} className="flex min-h-[60px] w-full rounded-md border border-input border-gray-700 bg-transparent text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 p-4" placeholder={messageList.length == 0 ? "What contracts do you want for your project?" : "Enter a reply..."}></textarea>
+                    <Label className="font-light text-muted-foreground">
+                        {messageList.length == 0 ? "What contracts do you want for your project?" : "Enter a reply..."}
+                    </Label>
+                    <InputExpandable ref={inputRef} />
                     <div className="flex items-center">
                         <div className="w-full inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors ml-auto">
                             <Tooltip content="Restart"><ButtonTrash onClick={restart} /></Tooltip>
