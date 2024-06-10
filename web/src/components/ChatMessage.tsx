@@ -1,6 +1,7 @@
 import MarkdownPreview from '@uiw/react-markdown-preview';
+import React, { PropsWithRef } from 'react';
 
-interface MessageProps {
+interface ChatMessageProps {
     message?: string;
     fromUser: boolean;
 }
@@ -8,9 +9,9 @@ interface MessageProps {
 const wrapperClasses = "flex flex-col items-start gap-2 rounded-lg p-1 mb-4 text-sm transition-all max-w-xl hover:bg-secondary/80";
 const fromUserWrapperClasses = "flex flex-col items-start gap-2 rounded-lg p-1 mb-4 text-sm transition-all max-w-xl ml-auto bg-yellow hover:bg-primary/80";
 
-export default function Message({ message, fromUser }: MessageProps) {
+export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(({ message, fromUser }, ref) => {
     return (
-        <div className={fromUser ? fromUserWrapperClasses : wrapperClasses}>
+        <div ref={ref} className={fromUser ? fromUserWrapperClasses : wrapperClasses}>
             <div></div>
             {fromUser ? (
                 <div className="font-bold pb-2 px-2">
@@ -36,4 +37,4 @@ export default function Message({ message, fromUser }: MessageProps) {
             )}
         </div>
     );
-}
+});

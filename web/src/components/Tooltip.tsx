@@ -9,7 +9,7 @@ export default function Tooltip({ children, content }: { children: React.ReactNo
     return (
         <TooltipProvider>
       <UITooltip delayDuration={200}>
-        <TooltipTrigger>
+        <TooltipTrigger asChild>
             {children}
         </TooltipTrigger>
         <TooltipContent>

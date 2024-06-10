@@ -1,19 +1,15 @@
 "use client";
 
-import { PartySocket } from "partysocket";
 import { ErrorEvent } from "partysocket/ws";
 import { useEffect, useRef, useState } from "react";
-import Message from "../components/Message";
+import ChatMessageContainer from "../components/ChatMessageContainer";
 import { Message as MT } from "../helpers/types";
 import { Socket, io } from "socket.io-client";
 
-import ButtonNext from "../components/ButtonNext";
-import ButtonSend from "../components/ButtonSend";
-import ButtonTrash from "../components/ButtonTrash";
+import ChatButtons from "../components/ChatButtons";
 
 import * as parse from "../helpers/parse";
 import Tooltip from "../components/Tooltip";
-import { Input } from "@/components/ui/input";
 import InputExpandable from "@/components/InputExpandable";
 import { Label } from "@/components/ui/label";
 
@@ -282,9 +278,9 @@ export default function Chat({ relayAddress, agentAddress }: ChatProps) {
 
     return (
         <div className="grid gap-4 max-w-5xl w-[100%] p-10 overflow-y-scroll">
-            {messageList.map((message, index) => (
-                <Message key={index} message={message.message} fromUser={message.fromUser} />
-            ))}
+            <ChatMessageContainer messageList={messageList} />
+            <div>
+
             {done && (
                 <h2 className="scroll-m-20 pb-2 text-3xl tracking-tight first:mt-0 text-gray-400">
                     {"Done! Now you can catch some zzzs 😴"}
@@ -295,39 +291,17 @@ export default function Chat({ relayAddress, agentAddress }: ChatProps) {
                     <Label className="font-light text-muted-foreground">
                         {messageList.length == 0 ? "What contracts do you want for your project?" : "Enter a reply..."}
                     </Label>
-                    <InputExpandable ref={inputRef} />
-                    <div className="flex items-center">
-                        <div className="w-full inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors ml-auto">
-                            <Tooltip content="Restart"><ButtonTrash onClick={restart} /></Tooltip>
-                            {agentAvailable() ? (
-                                <>
-                                    <ButtonSend color={doneWithSpec ? "accent" : "yellow"} onClick={handleEnter} loading={loading} />
-                                    {doneWithSpec && (
-                                        <button
-                                            onClick={proceedToNextAgent}
-                                            className="text-black ml-4 font-bold flex-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 shadow-md shadow-yellow-600/50 text-primary-foreground shadow hover:bg-primary/90 h-8 rounded-md px-3 text-xs"
-                                            style={{ backgroundColor: "rgb(213, 234, 23)" }}
-                                        >
-                                            {loading ? (
-                                                <svg className="w-full animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                </svg>
-                                            ) : "Done with spec"}
-                                        </button>
-                                    )}
-                                    <Tooltip content="Skip to next stage"><ButtonNext onClick={proceedToNextAgent} /></Tooltip>
-                                </>
-                            ) : (
-                                <button
-                                    disabled
-                                    className="text-black font-bold flex-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 shadow-md shadow-yellow-600/50 text-primary-foreground shadow hover:bg-primary/90 h-8 rounded-md px-3 text-xs"
-                                    style={{ backgroundColor: "rgb(213, 234, 23)" }}
-                                >Snooze works hard so you can sleep 😴</button>
-                            )}
-                        </div>
-                    </div>
+                    <InputExpandable inputRef={inputRef} />
+                    <ChatButtons
+                        restart={restart}
+                        agentAvailable={agentAvailable}
+                        doneWithSpec={doneWithSpec}
+                        handleEnter={handleEnter}
+                        loading={loading}
+                        proceedToNextAgent={proceedToNextAgent}
+                    />
                 </div>
+            </div>
             </div>
         </div>
     );
