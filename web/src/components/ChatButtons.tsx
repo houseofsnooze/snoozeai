@@ -1,7 +1,7 @@
-import { ButtonNext } from "../components/ButtonNext";
-import { ButtonSkip } from "./ButtonSkip";
-import { ButtonSend } from "../components/ButtonSend";
-import { ButtonTrash } from "../components/ButtonTrash";
+import ButtonNext from "../components/ButtonNext";
+import ButtonSkip from "../components/ButtonSkip";
+import ButtonSend from "../components/ButtonSend";
+import ButtonTrash from "../components/ButtonTrash";
 import Tooltip from "./Tooltip";
 import { Label } from "./ui/label";
 import LoadingSpinner from "./LoadingSpinner";

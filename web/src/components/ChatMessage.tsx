@@ -9,7 +9,7 @@ interface ChatMessageProps {
 const wrapperClasses = "flex flex-col items-start gap-2 rounded-lg p-1 mb-4 text-sm transition-all w-fit hover:bg-secondary/80";
 const fromUserWrapperClasses = "flex flex-col items-start gap-2 rounded-lg p-1 mb-4 text-sm transition-all w-fit ml-auto bg-yellow hover:bg-primary/80";
 
-export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(({ message, fromUser }, ref) => {
+const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(({ message, fromUser }, ref) => {
     return (
         <div ref={ref} className={fromUser ? fromUserWrapperClasses : wrapperClasses}>
             <div></div>
@@ -39,3 +39,7 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(({
         </div>
     );
 });
+
+ChatMessage.displayName = "ChatMessage";
+
+export default ChatMessage;

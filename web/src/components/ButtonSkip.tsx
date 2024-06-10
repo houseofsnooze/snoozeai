@@ -5,7 +5,7 @@ interface ButtonSkipProps {
     onClick: () => void;
 }
 
-export const ButtonSkip = React.forwardRef<HTMLButtonElement, ButtonSkipProps>(({ onClick }, ref) => {
+const ButtonSkip = React.forwardRef<HTMLButtonElement, ButtonSkipProps>(({ onClick }, ref) => {
     return (
         <Button
             ref={ref}
@@ -16,3 +16,7 @@ export const ButtonSkip = React.forwardRef<HTMLButtonElement, ButtonSkipProps>((
         </Button>
     )
 });
+
+ButtonSkip.displayName = "ButtonSkip";
+
+export default ButtonSkip;

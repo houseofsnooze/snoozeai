@@ -7,7 +7,7 @@ interface ButtonNextProps {
     onClick: () => void;
 }
 
-export const ButtonNext = React.forwardRef<HTMLButtonElement, ButtonNextProps>(({ onClick, loading }, ref) => {
+const ButtonNext = React.forwardRef<HTMLButtonElement, ButtonNextProps>(({ onClick, loading }, ref) => {
     return (
         <Button
             ref={ref}
@@ -19,3 +19,7 @@ export const ButtonNext = React.forwardRef<HTMLButtonElement, ButtonNextProps>((
         </Button>
     )
 });
+
+ButtonNext.displayName = "ButtonNext";
+
+export default ButtonNext;

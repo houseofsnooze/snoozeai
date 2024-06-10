@@ -9,7 +9,6 @@ import { Socket, io } from "socket.io-client";
 import ChatButtons from "../components/ChatButtons";
 
 import * as parse from "../helpers/parse";
-import Tooltip from "../components/Tooltip";
 import InputExpandable from "@/components/InputExpandable";
 import { Label } from "@/components/ui/label";
 

@@ -5,7 +5,7 @@ interface ButtonTrashProps {
     onClick: () => void;
 }
 
-export const ButtonTrash = React.forwardRef<HTMLButtonElement, ButtonTrashProps>(({ onClick }, ref) => {
+const ButtonTrash = React.forwardRef<HTMLButtonElement, ButtonTrashProps>(({ onClick }, ref) => {
     return (
         <Button
             ref={ref}
@@ -16,3 +16,7 @@ export const ButtonTrash = React.forwardRef<HTMLButtonElement, ButtonTrashProps>
         </Button>
     )
 });
+
+ButtonTrash.displayName = "ButtonTrash";
+
+export default ButtonTrash;

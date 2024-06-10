@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { ChatMessage } from "./ChatMessage";
+import { useEffect, useRef } from "react";
+import ChatMessage from "./ChatMessage";
 import { Message as MT } from "../helpers/types";
 
 export default function ChatMessageContainer({ messageList }: { messageList: MT[] }) {
@@ -11,10 +11,6 @@ export default function ChatMessageContainer({ messageList }: { messageList: MT[
             const topPos = lastMessageRef.offsetTop;
             lastMessageRef.parentElement.scrollTop = topPos;
         }
-        // const lastMessageRef = messageRefs.current[messageList.length - 1];
-        // if (lastMessageRef) {
-        //     lastMessageRef.scrollIntoView({ behavior: "smooth", block: "start" });
-        // }
     }, [messageList]);
 
     return (

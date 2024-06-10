@@ -8,7 +8,7 @@ interface ButtonSendProps {
     color: "yellow" | "accent";
 }
 
-export const ButtonSend = React.forwardRef<HTMLButtonElement, ButtonSendProps>(({ onClick, loading, color }, ref) => {
+const ButtonSend = React.forwardRef<HTMLButtonElement, ButtonSendProps>(({ onClick, loading, color }, ref) => {
     return (
         <Button
             ref={ref}
@@ -20,3 +20,7 @@ export const ButtonSend = React.forwardRef<HTMLButtonElement, ButtonSendProps>((
         </Button>
     )
 });
+
+ButtonSend.displayName = "ButtonSend";
+
+export default ButtonSend;
