@@ -1,5 +1,6 @@
 import os
-from autogen import ConversableAgent, UserProxyAgent, GroupChatManager, GroupChat
+from autogen.agentchat import ConversableAgent, UserProxyAgent
+# from autogen import ConversableAgent, UserProxyAgent, GroupChatManager, GroupChat
 from prompts import prompts
 from autogen.coding import LocalCommandLineCodeExecutor
 

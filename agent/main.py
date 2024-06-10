@@ -10,11 +10,16 @@ from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager  # noqa: E402
 from fastapi import FastAPI, WebSocket, BackgroundTasks
 from fastapi.responses import HTMLResponse
+import pprint
 import uvicorn
 
 from agents import agents
 from helpers.register_tools import register_tools
 from prompts import prompts
+
+# Configure logging
+logging_session_id = autogen.runtime_logging.start(logger_type="file", config={"filename": "main.log"})
+print("Logging session ID: " + str(logging_session_id))
 
 # Global variable to store the server context manager
 ws_ctx = None
@@ -73,6 +78,11 @@ def on_connect(iostream: IOWebsockets) -> None:
         },
     ])
 
+    pprint.pprint(chat_results.chat_history)
+    pprint.pprint(chat_result.cost)
+
+    autogen.runtime_logging.stop()
+
 async def start_server():
     global ws_ctx
     ws_ctx = IOWebsockets.run_server_in_thread(host="0.0.0.0", on_connect=on_connect, port=1337)
@@ -91,12 +101,6 @@ async def run_websocket_server(app):
     await start_server()
     yield
     await stop_server()
-
-# async def run_websocket_server(app):
-#     with IOWebsockets.run_server_in_thread(host="0.0.0.0", on_connect=on_connect, port=1337) as uri:
-#         print(f"Websocket server started at {uri}.", flush=True)
-#         yield
-#         # clean up would go here
 
 app = FastAPI(lifespan=run_websocket_server)
 

@@ -1,3 +1,4 @@
+autogen_logs
 fury_env/
 venv
 __pycache__/
