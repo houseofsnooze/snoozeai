@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from "react";
-import { CENTRAL_RELAY_URL, SNOOZE_AGENT_URL_KEY, SNOOZE_RELAY_URL_KEY } from "../helpers/constants";
-import NotificationTicker from "../components/NotificationTicker";
 import Home from "../screens/Home";
 import Chat from "../screens/Chat";
+import Header from "../components/Header";
+import NotificationTicker from "../components/NotificationTicker";
+import { CENTRAL_RELAY_URL, SNOOZE_AGENT_URL_KEY, SNOOZE_RELAY_URL_KEY } from "../helpers/constants";
 
 export default function Main() {
   const [loading, setLoading] = useState(false);
@@ -68,6 +69,7 @@ export default function Main() {
 
   return (
     <div className="h-[100vh] flex justify-between flex-col">
+      <Header />
       <main className="flex h-[100vh] flex-col items-center justify-center">
         {!running && <Home setupSession={setupSession} />}
         {running && <Chat relayAddress={relayAddress} agentAddress={agentAddress} />}

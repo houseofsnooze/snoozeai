@@ -10,6 +10,20 @@ const fontSans = FontSans({ subsets: ["latin"], variable: "--font-sans" });
 export const metadata: Metadata = {
   title: "Snooze",
   description: "AI web3 developer",
+  openGraph: {
+    title: 'Snooze',
+    description: 'AI web3 developer',
+    url: 'https://app.snoozeai.xyz',
+    siteName: 'Snooze',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Snooze',
+    description: 'AI web3 developer',
+    creator: '@houseofsnooze',
+  },
 };
 
 export default function RootLayout({
