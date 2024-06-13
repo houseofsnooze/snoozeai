@@ -6,8 +6,8 @@ interface ChatMessageProps {
     fromUser: boolean;
 }
 
-const wrapperClasses = "flex flex-col items-start gap-2 rounded-lg p-1 mb-4 text-sm transition-all w-fit hover:bg-secondary/80";
-const fromUserWrapperClasses = "flex flex-col items-start gap-2 rounded-lg p-1 mb-4 text-sm transition-all w-fit ml-auto bg-yellow hover:bg-primary/80";
+const wrapperClasses = "flex flex-col text-foreground items-start gap-2 rounded-lg p-1 mb-4 text-sm transition-all w-fit";
+const fromUserWrapperClasses = "flex flex-col items-start gap-2 rounded-lg p-1 mb-4 text-sm transition-all w-fit ml-auto bg-yellow";
 
 const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(({ message, fromUser }, ref) => {
     return (
@@ -29,6 +29,7 @@ const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(({ messag
                     style={{
                         background: "transparent",
                         borderRadius: "6px",
+                        color: 'unset',
                         maxWidth: '50vw',
                         paddingBottom: 10,
                         paddingTop: 0,

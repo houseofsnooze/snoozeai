@@ -6,9 +6,10 @@ import { Input } from "@/components/ui/input"
 
 interface FormHomeConfigProps {
     onEnter: (relayAddress: string, agentAddress: string) => void;
+    cancel: () => void;
 }
 
-export default function FormHomeConfig({ onEnter }: FormHomeConfigProps) {
+export default function FormHomeConfig({ onEnter, cancel }: FormHomeConfigProps) {
     const relayAddress = useRef<HTMLInputElement>(null)
     const agentAddress = useRef<HTMLInputElement>(null)
 
@@ -20,7 +21,7 @@ export default function FormHomeConfig({ onEnter }: FormHomeConfigProps) {
     }
 
     return (
-        <div className="w-1/3 space-y-4">
+        <div className="space-y-4">
             <div>
             <label className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Relay address</label>
             <Input
@@ -39,10 +40,17 @@ export default function FormHomeConfig({ onEnter }: FormHomeConfigProps) {
                 defaultValue="ws://127.0.0.1:1337"
             />
             </div>
+            <div className="flex gap-2">
+                <Button
+                onClick={cancel}
+                className="w-fit text-2xl font-bold shadow uppercase"
+                variant={"ghost"}
+            >Cancel</Button>
             <Button
                 onClick={handleClick}
-                className="w-fit text-2xl font-bold shadow"
-            >ENTER</Button>
+                className="w-fit text-2xl font-bold shadow uppercase"
+            >Enter</Button>
+            </div>
         </div>
     )
 }

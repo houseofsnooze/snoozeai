@@ -5,9 +5,10 @@ import LoadingSpinner from "./LoadingSpinner";
 
 interface HomeButtonsProps {
     onSubmit: (addresses?: { relayAddress: string, agentAddress: string }) => void;
+    setShowHeader: (show: boolean) => void;
 }
 
-export default function HomeButtons({ onSubmit }: HomeButtonsProps) {
+export default function HomeButtons({ onSubmit, setShowHeader }: HomeButtonsProps) {
     const [loading, setLoading] = useState(false);
     const [showStartButton, setShowStartButton] = useState(true);
     const [showConfigInput, setShowConfigInput] = useState(false);
@@ -21,6 +22,12 @@ export default function HomeButtons({ onSubmit }: HomeButtonsProps) {
     function handleConfig() {
         setShowConfigInput(true);
         setShowStartButton(false);
+        setShowHeader(false);
+    }
+    function cancelConfig() {
+        setShowConfigInput(false);
+        setShowStartButton(true);
+        setShowHeader(true);
     }
 
     function submitConfig(relayAddress: string, agentAddress: string) {
@@ -32,22 +39,22 @@ export default function HomeButtons({ onSubmit }: HomeButtonsProps) {
             {showStartButton && (
                 <Button
                     onClick={handleStart}
-                    className="w-fit text-2xl font-bold shadow"
+                    className="w-fit text-2xl font-bold shadow uppercase"
                     disabled={loading}
                 >
-                    {loading ? <LoadingSpinner /> : "START"}
+                    {loading ? <LoadingSpinner /> : "Start"}
                 </Button>
             )}
             {!showConfigInput && (
                 <Button
                     onClick={handleConfig}
-                    className="w-fit text-2xl font-bold shadow text-gray-400"
-                    variant={"secondary"}
+                    className="w-fit text-2xl font-bold shadow uppercase"
+                    variant={"ghost"}
                 >
-                    CONFIGURE
+                    Configure
                 </Button>
             )}
-            {showConfigInput && <FormHomeConfig onEnter={submitConfig} />}
+            {showConfigInput && <FormHomeConfig onEnter={submitConfig} cancel={cancelConfig} />}
         </div>
     )
 }

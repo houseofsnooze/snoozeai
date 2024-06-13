@@ -37,7 +37,14 @@ export default function RootLayout({
         "min-h-screen",
         fontSans.className
       )}>
-          {children}
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
       </body>
     </html>
   );
