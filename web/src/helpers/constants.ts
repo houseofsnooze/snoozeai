@@ -5,21 +5,13 @@ export const CENTRAL_RELAY_URL = "relay.snoozeai.xyz";
 export const DUMMY_API_KEY = "dummy-snooze-api-key";
 
 export const AGENTS = {
-  Spec_Writer: "done with spec",
-  Client: "hmm...",
-  Client_Rep: "proceed",
-  "Client Rep": "proceed",
-  Contract_Writer: "done with contract",
-  Contract_Reviewer: "done with review",
-  Test_Writer: "done writing tests",
-  Test_Reviewer: "done reviewing tests",
-  Test_Fixer: "done fixing tests",
-  "Spec Writer": "done with spec",
-  "Contract Writer": "done with contract",
-  "Contract Reviewer": "done with review",
-  "Test Writer": "done writing tests",
-  "Test Fixer": "done fixing tests",
-  "Test Reviewer": "done reviewing tests",
+  "Client Rep": "Client Rep",
+  "Spec Writer": "Spec Writer",
+  "Contract Writer": "Contract Writer",
+  "Contract Reviewer": "Contract Reviewer",
+  "Test Writer": "Test Writer",
+  "Test Reviewer": "Test Reviewer",
+  "Test Fixer": "Test Fixer",
 };
 
 export const STAGES = {

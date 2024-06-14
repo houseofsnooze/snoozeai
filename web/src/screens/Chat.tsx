@@ -310,6 +310,7 @@ export default function Chat({
 
   return (
     <div className="">
+      <ChatStage agent={currentAgent} />
       <div className="grid gap-4 max-w-5xl w-[100%] p-10">
         <div
           style={{
@@ -345,7 +346,6 @@ export default function Chat({
           </div>
         </div>
       </div>
-      <ChatStage agent={currentAgent} />
     </div>
   );
 }

@@ -24,7 +24,6 @@ const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
           <div className="font-bold pb-2 px-2">
             <MarkdownPreview
               source={message}
-              
               style={{
                 background: "transparent",
                 color: "unset",
@@ -36,8 +35,9 @@ const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
           <MarkdownPreview
             source={message}
             wrapperElement={{
-                "data-color-mode": colorMode
-              }}
+              // @ts-ignore
+              "data-color-mode": colorMode,
+            }}
             style={{
               background: "transparent",
               borderRadius: "6px",
