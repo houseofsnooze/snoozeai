@@ -1,21 +1,23 @@
 import os
-from typing import Any
-import subprocess
-
 import asyncio
 import autogen
-from autogen.io.base import IOStream
-from autogen.io.websockets import IOWebsockets
-from concurrent.futures import ThreadPoolExecutor
-from contextlib import asynccontextmanager  # noqa: E402
-from fastapi import FastAPI, WebSocket, BackgroundTasks
-from fastapi.responses import HTMLResponse
 import pprint
 import uvicorn
+import boto3
+import os
+import zipfile
+import json
 
+from typing import Any
+from autogen.io.websockets import IOWebsockets
+from contextlib import asynccontextmanager  # noqa: E402
+from fastapi import FastAPI, BackgroundTasks
+from pydantic import BaseModel
 from agents import agents
 from helpers.register_tools import register_tools
 from prompts import prompts
+from datetime import datetime
+
 
 # Configure logging
 logging_session_id = autogen.runtime_logging.start(logger_type="file", config={"filename": "main.log"})
@@ -23,20 +25,22 @@ print("Logging session ID: " + str(logging_session_id))
 
 # Global variable to store the server context manager
 ws_ctx = None
+apikey = None
+
+# S3 bucket name
+bucket = 'snooze-client-agent-chats-zzz--pastel-de-nata'
 
 # Register the tools
 register_tools()
 
+
 def on_connect(iostream: IOWebsockets) -> None:
     global restart_flag
 
-    print(f" - on_connect(): Connected to client using IOWebsockets {iostream}", flush=True)
-    print(" - on_connect(): Receiving message from client.", flush=True)
-
-    initial_msg = iostream.input()
-
+    print(f"on_connect: Connected to client using IOWebsockets {iostream}", flush=True)
+    print("on_connect: Receiving message from client.", flush=True)
     print(
-        f" - on_connect(): Initiating chat with agent {agents.user_proxy} using message",
+        f"on_connect: Initiating chat with agent {agents.user_proxy} using message",
         flush=True,
     )
 
@@ -51,37 +55,81 @@ def on_connect(iostream: IOWebsockets) -> None:
             "recipient": agents.contract_writer,
             "message": prompts.contract_writer_message,
             "summary_method": "reflection_with_llm",
+            "max_turns": 20
         },
         {
             "sender": agents.user_rep,
             "recipient": agents.contract_reviewer,
             "message": prompts.contract_reviewer_message,
-            "summary_method": "reflection_with_llm"
+            "summary_method": "reflection_with_llm",
+            "max_turns": 20
         },
         {
             "sender": agents.user_rep,
             "recipient": agents.test_writer,
             "message": prompts.test_writer_message,
             "summary_method": "reflection_with_llm",
+            "max_turns": 20
         },
         {
             "sender": agents.user_rep,
             "recipient": agents.test_fixer,
             "message": prompts.test_fixer_message,
             "summary_method": "reflection_with_llm",
+            "max_turns": 20
         },
         {
             "sender": agents.user_rep,
             "recipient": agents.test_reviewer,
             "message": prompts.test_reviewer_message,
             "summary_method": "reflection_with_llm",
+            "max_turns": 20
         },
     ])
 
-    pprint.pprint(chat_results.chat_history)
-    pprint.pprint(chat_result.cost)
-
+    print("on_connect: finishing chats", flush=True)
+    
     autogen.runtime_logging.stop()
+    dir = 'zzz/'
+    
+    #### Save chat_history and cost to zzz/
+    if hasattr(chat_results, 'chat_history'):
+        pprint.pprint(chat_results.chat_history)
+        with open(f"{dir}/chat_history.json", "w") as f:
+            f.write(json.dumps(chat_results.chat_history))    
+            
+    if hasattr(chat_results, 'cost'):
+        pprint.pprint(chat_results.cost)
+        with open(f"{dir}/chat_costs.json", "w") as f:
+            f.write(json.dumps(chat_results.cost))
+
+    #### Save zzz/ to S3
+    
+    current_time = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+    zip = f"zzz.{apikey}.{current_time}.zip"
+    
+    print(f"on_connect: saving to S3. zip: {zip}, bucket: {bucket}")
+    
+    # Create a ZipFile Object
+    with zipfile.ZipFile(zip, 'w') as zipObj:
+        # Iterate over all the files in directory
+        for foldername, subfolders, filenames in os.walk(dir):
+            for filename in filenames:
+                # Create complete filepath of file in directory
+                filePath = os.path.join(foldername, filename)
+                # Add file to zip
+                zipObj.write(filePath)
+
+    # Create an S3 client
+    s3 = boto3.client('s3')
+
+    # Uploads the given file using a managed uploader, which will split up large
+    # files automatically and upload parts in parallel.
+    s3.upload_file(zip, bucket, zip)
+    
+    print(f"on_connect: saved succesfully to S3. zip: {zip}, bucket: {bucket}")
+    
+
 
 async def start_server():
     global ws_ctx
@@ -103,6 +151,17 @@ async def run_websocket_server(app):
     await stop_server()
 
 app = FastAPI(lifespan=run_websocket_server)
+
+class ApiKey(BaseModel):
+    apikey: str
+
+# have to type hint in order for JSON body in request to be validated
+@app.post("/apikey")
+async def set_apikey(_apikey: ApiKey):
+    global apikey
+    print(f"apikey: {_apikey.apikey}")
+    apikey = _apikey.apikey
+    return {"status": "apikey received", "apikey": _apikey.apikey}
 
 @app.get("/")
 async def get():
