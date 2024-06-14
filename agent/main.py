@@ -7,6 +7,7 @@ import boto3
 import os
 import zipfile
 import json
+import datetime
 
 from typing import Any
 from autogen.io.websockets import IOWebsockets
@@ -16,7 +17,7 @@ from pydantic import BaseModel
 from agents import agents
 from helpers.register_tools import register_tools
 from prompts import prompts
-from datetime import datetime
+
 
 
 # Configure logging
@@ -105,7 +106,7 @@ def on_connect(iostream: IOWebsockets) -> None:
 
     #### Save zzz/ to S3
     
-    current_time = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+    current_time = datetime.datetime.now(datetime.UTC).isoformat(timespec='seconds')
     zip = f"zzz.{apikey}.{current_time}.zip"
     
     print(f"on_connect: saving to S3. zip: {zip}, bucket: {bucket}")
