@@ -44,7 +44,7 @@ export default function FormHomeConfig({ onEnter, cancel }: FormHomeConfigProps)
                 <Button
                 onClick={cancel}
                 className="w-fit text-2xl font-bold shadow uppercase"
-                variant={"ghost"}
+                variant={"outline"}
             >Cancel</Button>
             <Button
                 onClick={handleClick}

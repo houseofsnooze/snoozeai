@@ -12,10 +12,12 @@ export default function HomeButtons({ onSubmit, setShowHeader }: HomeButtonsProp
     const [loading, setLoading] = useState(false);
     const [showStartButton, setShowStartButton] = useState(true);
     const [showConfigInput, setShowConfigInput] = useState(false);
+    const [showConfigButton, setShowConfigButton] = useState(true);
 
     function handleStart() {
         setLoading(true);
         setShowConfigInput(false);
+        setShowConfigButton(false);
         onSubmit();
     }
 
@@ -45,11 +47,11 @@ export default function HomeButtons({ onSubmit, setShowHeader }: HomeButtonsProp
                     {loading ? <LoadingSpinner /> : "Start"}
                 </Button>
             )}
-            {!showConfigInput && (
+            {!showConfigInput && showConfigButton && (
                 <Button
                     onClick={handleConfig}
                     className="w-fit text-2xl font-bold shadow uppercase"
-                    variant={"ghost"}
+                    variant={"outline"}
                 >
                     Configure
                 </Button>
