@@ -1,5 +1,18 @@
 ## Run
 
+### Upload artifacts to S3 
+
+#### With an agent running locally
+
+[Set up](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) an aws cli profile with the correct credentials.
+
+Provide an environmenet variable for the AWS profile so (Python/boto3) aws client can pick it up.
+
+```
+export AWS_PROFILE=xyz
+```
+
+
 ### Run agent locally
 ```
 cd snoozeai/agent
