@@ -5,7 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 interface FormHomeConfigProps {
-  onEnter: (relayAddress: string, agentAddress: string, snoozeApiKey: string) => void;
+  onEnter: (
+    relayAddress: string,
+    agentAddress: string,
+    snoozeApiKey: string
+  ) => void;
   cancel: () => void;
 }
 
@@ -15,11 +19,15 @@ export default function FormHomeConfig({
 }: FormHomeConfigProps) {
   const relayAddress = useRef<HTMLInputElement>(null);
   const agentAddress = useRef<HTMLInputElement>(null);
-  const snoozeApiKey = useRef<HTMLInputElement>(null)
+  const snoozeApiKey = useRef<HTMLInputElement>(null);
 
   function handleClick() {
     if (relayAddress.current && agentAddress.current && snoozeApiKey.current) {
-      onEnter(relayAddress.current.value, agentAddress.current.value, snoozeApiKey.current.value);
+      onEnter(
+        relayAddress.current.value,
+        agentAddress.current.value,
+        snoozeApiKey.current.value
+      );
     }
     return;
   }
@@ -47,11 +55,13 @@ export default function FormHomeConfig({
           placeholder="ws://127.0.0.1:1337"
           defaultValue="ws://127.0.0.1:1337"
         />
-        <label className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Snooze api key</label>
+        <label className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+          Snooze api key
+        </label>
         <Input
-            className="text-xl"
-            ref={snoozeApiKey}
-            placeholder="123e4567-e89b-12d3-a456-426614174000"
+          className="text-xl"
+          ref={snoozeApiKey}
+          placeholder="123e4567-e89b-12d3-a456-426614174000"
         />
       </div>
       <div className="flex gap-2">

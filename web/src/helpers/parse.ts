@@ -1,3 +1,5 @@
+import { AGENTS } from "./constants";
+
 export function startsWithProvideFeeback(message: string) {
   if (message) {
     if (message.includes("Provide feedback to ")) {
@@ -37,24 +39,6 @@ export function includesToClient(message: string) {
   }
   return false;
 }
-
-const AGENTS = {
-  Spec_Writer: "done with spec",
-  Client: "hmm...",
-  Client_Rep: "proceed",
-  "Client Rep": "proceed",
-  Contract_Writer: "done with contract",
-  Contract_Reviewer: "done with review",
-  Test_Writer: "done writing tests",
-  Test_Reviewer: "done reviewing tests",
-  Test_Fixer: "done fixing tests",
-  "Spec Writer": "done with spec",
-  "Contract Writer": "done with contract",
-  "Contract Reviewer": "done with review",
-  "Test Writer": "done writing tests",
-  "Test Fixer": "done fixing tests",
-  "Test Reviewer": "done reviewing tests",
-};
 
 export function checkAgentMessage(msg: string) {
   console.log("snz3 - checkAgentMessage");

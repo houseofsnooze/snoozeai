@@ -6,11 +6,14 @@ import ChatMessageContainer from "../components/ChatMessageContainer";
 import { Message as MT } from "../helpers/types";
 import { Socket, io } from "socket.io-client";
 
+import ChatStage from "../components/ChatStage";
 import ChatButtons from "../components/ChatButtons";
 
 import * as parse from "../helpers/parse";
 import InputExpandable from "@/components/InputExpandable";
 import { Label } from "@/components/ui/label";
+import { STAGES } from "@/helpers/constants";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const messageQueue: string[] = [];
 const sentMessages: string[] = [];
@@ -23,13 +26,21 @@ interface ChatProps {
   snoozeApiKey: string;
 }
 
-export default function Chat({ relayAddress, agentAddress, snoozeApiKey }: ChatProps) {
-  console.log('rendering Chat with: ', relayAddress, agentAddress, snoozeApiKey);
+export default function Chat({
+  relayAddress,
+  agentAddress,
+  snoozeApiKey,
+}: ChatProps) {
+  console.log(
+    "rendering Chat with: ",
+    relayAddress,
+    agentAddress,
+    snoozeApiKey
+  );
   const [messageList, setMessageList] = useState<MT[]>([]);
   const [loading, setLoading] = useState(true);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState(false);
-  // const [currentAgent, setCurrentAgent] = useState("Spec Writer");
   const [showStart, setShowStart] = useState(true);
   const [doneWithSpec, setDoneWithSpec] = useState(false);
   const [done, setDone] = useState(false);
@@ -71,7 +82,7 @@ export default function Chat({ relayAddress, agentAddress, snoozeApiKey }: ChatP
 
   function requestPair() {
     console.log("requestPair: ", agentAddress, snoozeApiKey);
-    send("snooz3-pair" +  " " + agentAddress + " " + snoozeApiKey);
+    send("snooz3-pair" + " " + agentAddress + " " + snoozeApiKey);
   }
 
   async function onMessage(data: string) {
@@ -102,6 +113,9 @@ export default function Chat({ relayAddress, agentAddress, snoozeApiKey }: ChatP
     const { fromAgent, agent } = parse.checkAgentMessage(data);
     if (fromAgent) {
       console.log("prev agent", currentAgent, "next agent", agent);
+      if (agent == "Client Rep") {
+        return;
+      }
       currentAgent = agent;
       seenAgents.add(agent);
       return;
@@ -290,39 +304,48 @@ export default function Chat({ relayAddress, agentAddress, snoozeApiKey }: ChatP
     return (
       currentAgent.includes("Spec") ||
       currentAgent.includes("Contract Reviewer") ||
-      currentAgent.includes("Contract_Reviewer") ||
       currentAgent.includes("Fixer")
     );
   }
 
   return (
-    <div className="grid gap-4 max-w-5xl w-[100%] p-10 overflow-y-scroll">
-      <ChatMessageContainer messageList={messageList} />
-      <div>
-        {done && (
-          <h2 className="scroll-m-20 pb-2 text-3xl tracking-tight first:mt-0 text-gray-400">
-            {"Done! Now you can catch some zzzs 😴"}
-          </h2>
-        )}
-        <div className="ml-auto min-w-[300px] w-1/3">
-          <div className={"grid gap-4" + (done ? " hidden" : "")}>
-            <Label className="font-light text-muted-foreground">
-              {messageList.length == 0
-                ? "What contracts do you want for your project?"
-                : "Enter a reply..."}
-            </Label>
-            <InputExpandable inputRef={inputRef} />
-            <ChatButtons
-              restart={restart}
-              agentAvailable={agentAvailable}
-              doneWithSpec={doneWithSpec}
-              handleEnter={handleEnter}
-              loading={loading}
-              proceedToNextAgent={proceedToNextAgent}
-            />
+    <div className="">
+      <div className="grid gap-4 max-w-5xl w-[100%] p-10">
+        <div
+          style={{
+            height: "500px",
+            overflowY: "scroll",
+          }}
+        >
+          <ChatMessageContainer messageList={messageList} />
+        </div>
+        <div>
+          {done && (
+            <h2 className="scroll-m-20 pb-2 text-3xl tracking-tight first:mt-0 text-gray-400">
+              {"Done! Now you can catch some zzzs 😴"}
+            </h2>
+          )}
+          <div className="ml-auto min-w-[300px] w-1/3">
+            <div className={"grid gap-4" + (done ? " hidden" : "")}>
+              <Label className="font-light text-muted-foreground">
+                {messageList.length == 0
+                  ? "What contracts do you want for your project?"
+                  : "Enter a reply..."}
+              </Label>
+              <InputExpandable inputRef={inputRef} />
+              <ChatButtons
+                restart={restart}
+                agentAvailable={agentAvailable}
+                doneWithSpec={doneWithSpec}
+                handleEnter={handleEnter}
+                loading={loading}
+                proceedToNextAgent={proceedToNextAgent}
+              />
+            </div>
           </div>
         </div>
       </div>
+      <ChatStage agent={currentAgent} />
     </div>
   );
 }

@@ -8,15 +8,19 @@ import NotificationTicker from "../components/NotificationTicker";
 import {
   CENTRAL_RELAY_URL,
   SNOOZE_AGENT_URL_KEY,
-  SNOOZE_RELAY_URL_KEY, 
+  SNOOZE_RELAY_URL_KEY,
   DUMMY_API_KEY,
 } from "../helpers/constants";
 
 export default function Main() {
   const [loading, setLoading] = useState(false);
   const [running, setRunning] = useState(false);
-  const [relayAddress, setRelayAddress] = useState<string>("ws://127.0.0.1:8000");
-  const [agentAddress, setAgentAddress] = useState<string>("ws://127.0.0.1:1337");
+  const [relayAddress, setRelayAddress] = useState<string>(
+    "ws://127.0.0.1:8000"
+  );
+  const [agentAddress, setAgentAddress] = useState<string>(
+    "ws://127.0.0.1:1337"
+  );
   const [snoozeApiKey, setSnoozeApiKey] = useState<string>(DUMMY_API_KEY);
   const [countdown, setCountdown] = useState(60);
 
@@ -27,8 +31,12 @@ export default function Main() {
    *
    * @param addresses Relay and agent websocket urls
    */
-  async function setupSession(addresses?: { relayAddress: string, agentAddress: string, snoozeApiKey: string }) {
-    console.log('Setting up session');
+  async function setupSession(addresses?: {
+    relayAddress: string;
+    agentAddress: string;
+    snoozeApiKey: string;
+  }) {
+    console.log("Setting up session");
     setLoading(true);
 
     if (!addresses) {
@@ -67,22 +75,36 @@ export default function Main() {
    * Request an agent session from the central relay.
    * @returns Relay and agent websocket urls
    */
-  async function requestSession(): Promise<{ relayAddress: string, agentAddress: string, snoozeApiKey: string }> {
-    console.log('Requesting session from central relay');
+  async function requestSession(): Promise<{
+    relayAddress: string;
+    agentAddress: string;
+    snoozeApiKey: string;
+  }> {
+    console.log("Requesting session from central relay");
     const resp = await fetch(`https://${CENTRAL_RELAY_URL}/start`, {
       method: "POST",
     });
     const data = await resp.json();
-    console.log('Received session from central relay', data);
-    return { relayAddress: CENTRAL_RELAY_URL, agentAddress: data.wsUrl, snoozeApiKey: DUMMY_API_KEY };
+    console.log("Received session from central relay", data);
+    return {
+      relayAddress: CENTRAL_RELAY_URL,
+      agentAddress: data.wsUrl,
+      snoozeApiKey: DUMMY_API_KEY,
+    };
   }
 
   return (
     <div className="h-[100vh] flex justify-between flex-col">
       <Nav />
-      <main className="flex h-[100vh] flex-col items-center justify-center">
+      <main className="flex h-[100vh] flex-col items-center justify-center overflow-hidden">
         {!running && <Home setupSession={setupSession} />}
-        {running && <Chat relayAddress={relayAddress} agentAddress={agentAddress} snoozeApiKey={snoozeApiKey} />}
+        {running && (
+          <Chat
+            relayAddress={relayAddress}
+            agentAddress={agentAddress}
+            snoozeApiKey={snoozeApiKey}
+          />
+        )}
       </main>
       {loading && !running && (
         <NotificationTicker
