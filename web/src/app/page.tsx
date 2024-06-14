@@ -1,27 +1,38 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import Home from "../screens/Home";
 import Chat from "../screens/Chat";
 import Nav from "../components/Nav";
 import NotificationTicker from "../components/NotificationTicker";
-import { CENTRAL_RELAY_URL, SNOOZE_AGENT_URL_KEY, SNOOZE_RELAY_URL_KEY } from "../helpers/constants";
+import {
+  CENTRAL_RELAY_URL,
+  SNOOZE_AGENT_URL_KEY,
+  SNOOZE_RELAY_URL_KEY,
+} from "../helpers/constants";
 
 export default function Main() {
   const [loading, setLoading] = useState(false);
   const [running, setRunning] = useState(false);
-  const [relayAddress, setRelayAddress] = useState<string>("ws://127.0.0.1:8000");
-  const [agentAddress, setAgentAddress] = useState<string>("ws://127.0.0.1:1337");
+  const [relayAddress, setRelayAddress] = useState<string>(
+    "ws://127.0.0.1:8000"
+  );
+  const [agentAddress, setAgentAddress] = useState<string>(
+    "ws://127.0.0.1:1337"
+  );
   const [countdown, setCountdown] = useState(60);
 
   /**
    * Setup the agent session.
    * If relay and agent addresses are not set by the user,
    * use the central relay to get an agent address.
-   * 
+   *
    * @param addresses Relay and agent websocket urls
    */
-  async function setupSession(addresses?: { relayAddress: string, agentAddress: string }) {
+  async function setupSession(addresses?: {
+    relayAddress: string;
+    agentAddress: string;
+  }) {
     setLoading(true);
 
     if (!addresses) {
@@ -59,7 +70,10 @@ export default function Main() {
    * Request an agent session from the central relay.
    * @returns Relay and agent websocket urls
    */
-  async function requestSession(): Promise<{ relayAddress: string, agentAddress: string }> {
+  async function requestSession(): Promise<{
+    relayAddress: string;
+    agentAddress: string;
+  }> {
     const resp = await fetch(`https://${CENTRAL_RELAY_URL}/start`, {
       method: "POST",
     });
@@ -72,9 +86,15 @@ export default function Main() {
       <Nav />
       <main className="flex h-[100vh] flex-col items-center justify-center">
         {!running && <Home setupSession={setupSession} />}
-        {running && <Chat relayAddress={relayAddress} agentAddress={agentAddress} />}
+        {running && (
+          <Chat relayAddress={relayAddress} agentAddress={agentAddress} />
+        )}
       </main>
-      {loading && !running && (<NotificationTicker notification={`Starting your AI agent session. ${countdown} seconds remain. Please keep this page open.`} />)}
+      {loading && !running && (
+        <NotificationTicker
+          notification={`Starting your AI agent session. ${countdown} seconds remain. Please keep this page open.`}
+        />
+      )}
     </div>
   );
 }

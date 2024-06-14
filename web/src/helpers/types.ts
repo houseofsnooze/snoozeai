@@ -1,4 +1,4 @@
 export type Message = {
-    fromUser: boolean;
-    message: string;
-}
+  fromUser: boolean;
+  message: string;
+};
