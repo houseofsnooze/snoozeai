@@ -99,7 +99,6 @@ user_rep = ConversableAgent(
                    "If the AI gave you reviewed code in the message, you ask the AI to save the files. "
                    "If the AI saved the files, you ask the AI to double check whether it saved the files. "
                    "If the AI said they saved the files and double checked, you reply 'EXIT' to the AI to terminate the conversation. "
-                   "If the AI gave you a summary in the message, you remember it and relay it to the next agent. "
 )
  
 user_proxy = UserProxyAgent(

@@ -20,9 +20,11 @@ const seenAgents = new Set<string>();
 interface ChatProps {
   relayAddress: string;
   agentAddress: string;
+  snoozeApiKey: string;
 }
 
-export default function Chat({ relayAddress, agentAddress }: ChatProps) {
+export default function Chat({ relayAddress, agentAddress, snoozeApiKey }: ChatProps) {
+  console.log('rendering Chat with: ', relayAddress, agentAddress, snoozeApiKey);
   const [messageList, setMessageList] = useState<MT[]>([]);
   const [loading, setLoading] = useState(true);
   const [ready, setReady] = useState(false);
@@ -68,7 +70,8 @@ export default function Chat({ relayAddress, agentAddress }: ChatProps) {
   }
 
   function requestPair() {
-    send("snooz3-pair " + agentAddress);
+    console.log("requestPair: ", agentAddress, snoozeApiKey);
+    send("snooz3-pair" +  " " + agentAddress + " " + snoozeApiKey);
   }
 
   async function onMessage(data: string) {

@@ -6,7 +6,8 @@ import LoadingSpinner from "./LoadingSpinner";
 interface HomeButtonsProps {
   onSubmit: (addresses?: {
     relayAddress: string;
-    agentAddress: string;
+    agentAddress: string, 
+    snoozeApiKey: string;
   }) => void;
   setShowHeader: (show: boolean) => void;
 }
@@ -38,8 +39,8 @@ export default function HomeButtons({
     setShowHeader(true);
   }
 
-  function submitConfig(relayAddress: string, agentAddress: string) {
-    onSubmit({ relayAddress, agentAddress });
+  function submitConfig(relayAddress: string, agentAddress: string, snoozeApiKey: string) {
+    onSubmit({ relayAddress, agentAddress, snoozeApiKey });
   }
 
   return (

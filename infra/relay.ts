@@ -49,9 +49,7 @@ function main() {
             res.status(500).send('Failed to start agent session');
             return;
         }
-        const { wsUrl, taskId } = session;
-        // let wsUrl = "ws://host.docker.internal:1337";
-        // let taskId = 0;
+        const { wsUrl, taskId  } = session;
         connectToAgent(wsUrl);
         res.send({ taskId, wsUrl });
         return;
@@ -80,12 +78,49 @@ main();
 async function handleClientConnection (websocket: Socket) {
     const clientWsUrl = websocket.conn.remoteAddress;
     console.log(`Client connected: ${clientWsUrl}`);
+    // TODO: require API key be provided already
     connectedClients.set(clientWsUrl, websocket);
-
     websocket.on('message', async (message: string) => {
         if (message.startsWith('snooz3-pair')) {
-            console.log("Pairing to agent...")
             const agentWsUrl = message.split(' ')[1];
+
+            // set the API key
+            // assumed format to be snooz3-api-key:apikey
+            const apikey = message.split(' ')[2]; 
+
+            console.log(`ws-message snooze3-pair. message: ${message}, agentWSUrl: ${agentWsUrl}, apikey: ${apikey}`);
+
+            if (!agentWsUrl) {
+                console.error('ws-message: agent websocket not found - ', agentWsUrl);
+                return;
+            }
+            // TODO: this is a hack, need to get the ip from the agent ws url
+            // agentWsUrl: ws://172.17.0.2:1337
+            const domain = agentWsUrl.split('ws://')[1].split(':')[0];
+            const portAgent = 8080;
+
+            console.log('ws-message: sending api key to agent ', agentWsUrl, apikey);
+            
+            const payload = JSON.stringify({ apikey });
+            console.log('ws-message: payload ', payload);
+            await fetch(`http://${domain}:${portAgent}/apikey`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: payload,
+            })
+            .then(resp => resp.json())
+            .then(data => {
+                console.log('response for POST /apikey: ', data);
+            })
+            .catch((error) => {
+                console.error('Error sending api key to agent', error);
+            });
+
+
+            // pairing agent
+            console.log("Pairing to agent...")
             const agentWs = connectedAgents.get(agentWsUrl);
             if (!agentWs) {
                 console.error('Agent websocket not found', agentWsUrl);
@@ -133,6 +168,7 @@ function handleOpen(wsUrl: string, agentWebSocket: WebSocket) {
         agentWebSocket.send("start");
     }
 function handleMessage(wsUrl: string, message: MessageEvent) {
+    console.log('Received message from agent', wsUrl, message);
     const clientWsUrl = agentToClient.get(wsUrl);
         if (!clientWsUrl) {
             console.error('No client websocket url', clientWsUrl);
@@ -143,14 +179,17 @@ function handleMessage(wsUrl: string, message: MessageEvent) {
             console.error('Client websocket not found', clientWsUrl);
             return;
         }
+        // passing whatever message received
         clientWs.send(message.data);
 }
 function handleError(error: ErrorEvent) {
     console.error('Error', error);
 }
+
 function handleClose(wsUrl: string) {
     console.log('Closed: Connection to agent websocket server was closed', wsUrl);
-    // TODO: clean up the maps here
+    connectedAgents.delete(wsUrl);
+    agentToClient.delete(wsUrl);
 }
 
 // Creates client connection to the agent

@@ -2,10 +2,7 @@ import { useState } from "react";
 import HomeButtons from "../components/HomeButtons";
 
 interface HomeProps {
-  setupSession: (addresses?: {
-    relayAddress: string;
-    agentAddress: string;
-  }) => void;
+    setupSession: (addresses?: { relayAddress: string, agentAddress: string, snoozeApiKey: string }) => void;
 }
 
 export default function Home({ setupSession }: HomeProps) {
