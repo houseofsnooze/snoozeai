@@ -4,6 +4,7 @@ import React, { PropsWithRef } from "react";
 interface ChatMessageProps {
   message?: string;
   fromUser: boolean;
+  colorMode: string;
 }
 
 const wrapperClasses =
@@ -12,7 +13,7 @@ const fromUserWrapperClasses =
   "flex flex-col text-background items-start gap-2 rounded-lg p-1 mb-4 text-sm transition-all w-fit ml-auto bg-yellow";
 
 const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
-  ({ message, fromUser }, ref) => {
+  ({ message, fromUser, colorMode }, ref) => {
     return (
       <div
         ref={ref}
@@ -23,6 +24,7 @@ const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
           <div className="font-bold pb-2 px-2">
             <MarkdownPreview
               source={message}
+              
               style={{
                 background: "transparent",
                 color: "unset",
@@ -33,6 +35,9 @@ const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
         ) : (
           <MarkdownPreview
             source={message}
+            wrapperElement={{
+                "data-color-mode": colorMode
+              }}
             style={{
               background: "transparent",
               borderRadius: "6px",

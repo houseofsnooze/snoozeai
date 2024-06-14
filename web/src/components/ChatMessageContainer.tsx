@@ -1,12 +1,15 @@
 import { useEffect, useRef } from "react";
 import ChatMessage from "./ChatMessage";
 import { Message as MT } from "../helpers/types";
+import { useTheme } from "next-themes";
 
 export default function ChatMessageContainer({
   messageList,
 }: {
   messageList: MT[];
 }) {
+  const { theme } = useTheme();
+
   const messageRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
@@ -25,6 +28,7 @@ export default function ChatMessageContainer({
       ref={(el) => {
         messageRefs.current[index] = el;
       }}
+      colorMode={theme || "dark"}
     />
   ));
 }
