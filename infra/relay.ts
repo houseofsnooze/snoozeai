@@ -168,7 +168,7 @@ function handleOpen(wsUrl: string, agentWebSocket: WebSocket) {
         agentWebSocket.send("start");
     }
 function handleMessage(wsUrl: string, message: MessageEvent) {
-    console.log('Received message from agent', wsUrl, message);
+    console.log('Received message from agent', wsUrl, message.data);
     const clientWsUrl = agentToClient.get(wsUrl);
         if (!clientWsUrl) {
             console.error('No client websocket url', clientWsUrl);
