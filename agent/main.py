@@ -39,11 +39,13 @@ def on_connect(iostream: IOWebsockets) -> None:
     global restart_flag
 
     print(f"on_connect: Connected to client using IOWebsockets {iostream}", flush=True)
-    print("on_connect: Receiving message from client.", flush=True)
     print(
-        f"on_connect: Initiating chat with agent {agents.user_proxy} using message",
+        f"on_connect: Initiating chat with agent {agents.user_proxy}",
         flush=True,
     )
+
+    initial_msg = iostream.input()
+    print(f"on_connect: initial_msg: {initial_msg}", flush=True)
 
     chat_results = agents.user_proxy.initiate_chats([
         {
