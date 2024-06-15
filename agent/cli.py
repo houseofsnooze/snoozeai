@@ -14,25 +14,25 @@ chat_results = agents.user_proxy.initiate_chats([
          
     },
     {
-        # "sender": agents.user_rep,
+        "sender": agents.user_rep,
         "recipient": agents.contract_writer,
         "message": prompts.contract_writer_message,
         "summary_method": "reflection_with_llm",
     },
     {
-        # "sender": agents.user_rep,
+        "sender": agents.user_rep,
         "recipient": agents.contract_reviewer,
         "message": prompts.contract_reviewer_message,
         "summary_method": "reflection_with_llm"
     },
     {
-        # "sender": agents.user_rep,
+        "sender": agents.user_rep,
         "recipient": agents.test_writer,
         "message": prompts.test_writer_message,
         "summary_method": "reflection_with_llm",
     },
     {
-        # "sender": agents.user_rep,
+        "sender": agents.user_rep,
         "recipient": agents.test_fixer,
         "message": prompts.test_fixer_message,
         "summary_method": "reflection_with_llm",
