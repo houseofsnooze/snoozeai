@@ -110,6 +110,13 @@ export default function Chat({
       return;
     }
 
+    if (data.startsWith("snooz3-agent")) {
+      console.log("agent-message: ", data);
+      const encodedData = encodeURIComponent(data.replace('snooz3-agent: ', '').trim());
+      const s3URL = `https://snooze-client-agent-chats-zzz--pastel-de-nata.s3.us-east-2.amazonaws.com/${encodedData}`;
+      data = `Agent uploaded artifacts to S3: ${s3URL}`;
+    }
+
     const { fromAgent, agent } = parse.checkAgentMessage(data);
     if (fromAgent) {
       console.log("prev agent", currentAgent, "next agent", agent);

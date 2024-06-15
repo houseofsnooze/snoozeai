@@ -109,6 +109,7 @@ def on_connect(iostream: IOWebsockets) -> None:
     current_time = datetime.datetime.now(datetime.UTC).isoformat(timespec='seconds')
     zip = f"zzz.{apikey}.{current_time}.zip"
     
+    iostream.print(f"snooz3-agent: {zip}", flush=True)
     print(f"on_connect: saving to S3. zip: {zip}, bucket: {bucket}")
     
     # Create a ZipFile Object
