@@ -38,10 +38,8 @@ The next agent will review the tests for quality. """
 
 test_fixer_message = """Review the specification, smart contracts and the tests in zzz/, zzz/contracts and zzz/test. 
 Assume the tests and smart contracts are incorrect, and assume the specification is correct, 
-try fixing the tests and the smart contracts. 
-After fixing the tests and the smart contracts, run the tests. 
-You may need to initialize the tests. 
-After this step, it is the end of the tool. """
+try fixing the tests and/or smart contracts by rewriting them. 
+Save the fixed tests in zzz/test. """
 
 test_reviewer_message = """Review the specification, smart contracts and the tests in zzz/, zzz/contracts and zzz/test. 
 Fix any incorrect use of ethers API. Use only ethers v6 APIs. 
