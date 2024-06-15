@@ -5,6 +5,7 @@ export const CENTRAL_RELAY_URL = "relay.snoozeai.xyz";
 export const DUMMY_API_KEY = "dummy-snooze-api-key";
 
 export const AGENTS = {
+  Client: "Client",
   "Client Rep": "Client Rep",
   "Spec Writer": "Spec Writer",
   "Contract Writer": "Contract Writer",

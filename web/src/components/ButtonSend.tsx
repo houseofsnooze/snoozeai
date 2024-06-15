@@ -5,19 +5,18 @@ import { Button } from "./ui/button";
 interface ButtonSendProps {
   onClick: () => void;
   loading: boolean;
-  color: "yellow" | "accent";
 }
 
 const ButtonSend = React.forwardRef<HTMLButtonElement, ButtonSendProps>(
-  ({ onClick, loading, color }, ref) => {
+  ({ onClick, loading }, ref) => {
     return (
       <Button
         ref={ref}
         onClick={onClick}
-        className={`flex-1 text-xl font-bold shadow bg-${color} hover:bg-yellow/90 mx-2`}
+        className={`flex-1 text-xl uppercase font-bold shadow bg-yellow hover:bg-yellow/90 mx-2`}
         disabled={loading}
       >
-        {loading ? <LoadingSpinner /> : "SEND"}
+        {loading ? <LoadingSpinner /> : "Send"}
       </Button>
     );
   }

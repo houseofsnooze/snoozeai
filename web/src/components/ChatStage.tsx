@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -15,9 +17,8 @@ const mutedClasses = "text-muted-foreground";
 const defaultClasses = "text-foreground font-bold";
 
 const DESCRIPTIONS = {
-  [AGENTS["Client Rep"]]: "",
   [AGENTS["Spec Writer"]]:
-    "Answer 5-7 questions about your contract. Click the arrow when you are ready to move to the next stage.",
+    "Answer 5-7 questions about your contract. If you are satisfied with the spec click the arrows on the right to move to the next stage.",
   [AGENTS["Contract Writer"]]: "The agent spends 2-3 minutes writing Solidity.",
   [AGENTS["Contract Reviewer"]]:
     "The agent checks its work. If you want any changes made type them in the chat, otherwise click the arrow to move to the next stage.",
@@ -28,9 +29,22 @@ const DESCRIPTIONS = {
     "In this last step the agent fixes any issues if the tests fail.",
 };
 
-export default function ChatStage({ agent }: { agent: string }) {
+export default function ChatStage({
+  incomingAgent,
+}: {
+  incomingAgent: string;
+}) {
+  const [agent, setAgent] = useState("Spec Writer");
+  const [description, setDescription] = useState(DESCRIPTIONS["Spec Writer"]);
+
+  useEffect(() => {
+    if (!incomingAgent.includes("Client")) {
+      setAgent(incomingAgent);
+      setDescription(DESCRIPTIONS[incomingAgent]);
+    }
+  }, [incomingAgent]);
+
   function renderStages() {
-    console.log("agent in chat stage", agent);
     return stageKeys.map((stageKey, index) => {
       return (
         <>
@@ -48,11 +62,21 @@ export default function ChatStage({ agent }: { agent: string }) {
       );
     });
   }
+
+  function renderDescription() {
+    return (
+      <Alert>
+        <AlertDescription>{description}</AlertDescription>
+      </Alert>
+    );
+  }
+
   return (
-    <div className="container h-6">
+    <div className="container flex flex-col gap-4">
       <Breadcrumb>
         <BreadcrumbList>{renderStages()}</BreadcrumbList>
       </Breadcrumb>
+      {renderDescription()}
     </div>
   );
 }
