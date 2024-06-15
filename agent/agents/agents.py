@@ -11,7 +11,7 @@ seed = 42
 llm_config = {"model": "gpt-3.5-turbo-0125", "api_key": os.environ["OPENAI_API_KEY"], "temperature": 0, "timeout": 180, "max_retries": 2, "seed": seed}
 llm_config = {"model": "gpt-4o", "api_key": os.environ["OPENAI_API_KEY"], "temperature": 0, "timeout": 180, "max_retries": 2, "seed": seed}
 
-# llmconfig = {"model": "gpt-4-turbo", "api_key": os.environ["OPENAI_API_KEY"], "temperature": 0, "timeout": 60, "seed": seed}
+# llm_config = {"model": "gpt-4-turbo", "api_key"  : os.environ["OPENAI_API_KEY"], "temperature": 0, "timeout": 60, "seed": seed}
 
 # cannot call tools for some reason
 # generates responses with non sense
@@ -38,7 +38,7 @@ llm_config_warm["temperature"] = 1
 
 def _exit_pred(msg):
     if msg["content"]:
-        return "exit" in msg["content"].lower() or "goodbye!" in msg["content"].lower()
+        return "EXIT" in msg["content"] or "goodbye!" in msg["content"].lower()
     else:
         return False
 
@@ -64,6 +64,7 @@ contract_reviewer = ConversableAgent(
     name="Contract Reviewer",
     system_message=prompts.contract_reviewer_prompt,
     llm_config=llm_config,
+    human_input_mode="NEVER",
     max_consecutive_auto_reply=20,
     is_termination_msg=exit_pred
 )
