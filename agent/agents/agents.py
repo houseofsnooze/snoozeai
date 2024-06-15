@@ -36,7 +36,13 @@ llm_config = {"model": "gpt-4o", "api_key": os.environ["OPENAI_API_KEY"], "tempe
 llm_config_warm = dict(llm_config)
 llm_config_warm["temperature"] = 1
 
-exit_pred = lambda msg: "EXIT" in msg["content"] or "goodbye!" in msg["content"].lower()
+def _exit_pred(msg):
+    if msg["content"]:
+        return "exit" in msg["content"].lower() or "goodbye!" in msg["content"].lower()
+    else:
+        return False
+
+exit_pred = _exit_pred
 
 spec_writer = ConversableAgent(
     "Spec Writer",
@@ -84,6 +90,7 @@ test_fixer = ConversableAgent(
     name="Test Fixer",
     system_message=prompts.test_fixer_prompt,
     llm_config=llm_config,
+    human_input_mode="NEVER",
     max_consecutive_auto_reply=20,
     is_termination_msg=exit_pred
 )
@@ -98,7 +105,9 @@ user_rep = ConversableAgent(
                    "You MUST not propose to the AI that you will save the files, you MUST let the AI save the files by itself. "
                    "If the AI gave you reviewed code in the message, you ask the AI to save the files. "
                    "If the AI saved the files, you ask the AI to double check whether it saved the files. "
-                   "If the AI said they saved the files and double checked, you reply 'EXIT' to the AI to terminate the conversation. "
+                   "If the AI said they saved the files and double checked, you reply 'EXIT' to the AI to terminate the conversation. ",
+    max_consecutive_auto_reply=20,
+    is_termination_msg=exit_pred
 )
  
 user_proxy = UserProxyAgent(
