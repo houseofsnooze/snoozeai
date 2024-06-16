@@ -8,17 +8,10 @@ test_fixer_prompt = fs.read_file("prompts/test_fixer/fix_tests.md")
 test_writer_prompt = fs.read_file("prompts/test_writer/generate_tests.md")
 
 spec_writer_message = """Help me to elaborate on the specification for a new smart contract by asking good and concise questions.
-Name the spec `spec0.md` and put the spec in the zzz/ directory. 
-Since I am iterating and making the system feature by feature, 
-I will need you to check zzz/ and see if there are: 
-1. existing specification 
-2. existing tests (Hardhat tests written in Javascript, so look for .js files in a zzz/test directory)
-3. existing contracts (Solidity contracts, so look for .sol files in a zzz/contracts directory)
-If there are, read and reflect on the files, and help me write the next feature with this information in mind. 
-In your specification, add the new feature to the existing implementation. 
-Save the spec with an incremental suffix (e.g. if there is `spec1.md`, then name it `spec2.md` and so on) in the zzz/ directory. 
+Name the spec `spec0.md` and put the spec in the zzz/ directory. Create the directory if it does not exist.
 The next agent will write the smart contracts after. 
 You need to tell the next agent 'exit' when they finish the task and save all the files. 
+Start by asking me "Describe your smart contract application in a few sentences."
 """
 
 contract_writer_message = """Read the last written spec in zzz/. 

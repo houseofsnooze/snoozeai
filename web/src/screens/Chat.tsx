@@ -12,12 +12,12 @@ import ChatButtons from "../components/ChatButtons";
 import * as parse from "../helpers/parse";
 import InputExpandable from "@/components/InputExpandable";
 import { Label } from "@/components/ui/label";
-import { STAGES } from "@/helpers/constants";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 const messageQueue: string[] = [];
 const sentMessages: string[] = [];
+// Using Spec Writer for the first agent to set chat stage correctly
 let currentAgent: string = "Spec Writer";
+let previousAgent: string = "Client";
 const seenAgents = new Set<string>();
 
 interface ChatProps {
@@ -86,8 +86,8 @@ export default function Chat({
   }
 
   async function onMessage(data: string) {
-    console.log("received", data);
-    console.log("current agent", currentAgent);
+    console.log("onMessage received:", data);
+    console.log("onMessage current agent:", currentAgent);
 
     if (!data) {
       return;
@@ -95,11 +95,15 @@ export default function Chat({
 
     data = parse.removeAnsiCodes(data);
 
+    // HIDE
+    // Message indicates pairing was successful
     if (data == "snooz3-pair-success") {
       setReady(true);
       return;
     }
 
+    // SHOW
+    // Message indicates pairing failed
     if (data == "snooz3-pair-error") {
       displayMessage({
         fromUser: false,
@@ -110,30 +114,53 @@ export default function Chat({
       return;
     }
 
+    // SHOW
+    // Message indicates agent uploaded artifacts to S3
     if (data.startsWith("snooz3-agent")) {
       console.log("agent-message: ", data);
       const encodedData = encodeURIComponent(data.replace('snooz3-agent: ', '').trim());
       const s3URL = `https://snooze-client-agent-chats-zzz--pastel-de-nata.s3.us-east-2.amazonaws.com/${encodedData}`;
-      data = `Agent uploaded artifacts to S3: ${s3URL}`;
+      displayMessage({
+        fromUser: false,
+        message:
+          "Agent uploaded artifacts to S3: " + s3URL,
+      });
+      return;
     }
 
-    const { fromAgent, agent } = parse.checkAgentMessage(data);
+    // HIDE
+    // Message specifies the sender and recipient of the next message e.g. "Client (to Client Rep):"
+    const { fromAgent, agent } = parse.checkSpeakerMessage(data);
     if (fromAgent) {
-      console.log("prev agent", currentAgent, "next agent", agent);
-      if (agent == "Client Rep") {
+      console.log(
+        "prev sender:",
+        previousAgent,
+        "curr sender:",
+        currentAgent,
+        "next sender:",
+        agent
+      );
+      // Do not set current agent as client rep or client because it is used for the chat stage
+      // TODO: fix the aforementioned logic to make this less fragile
+      if (agent.includes("Client")) {
         return;
       }
+      previousAgent = currentAgent;
       currentAgent = agent;
       seenAgents.add(agent);
       return;
     }
 
+    // SHOW
+    // Message has js code
     if (data.includes("```javascript") && data.includes("const { expect }")) {
       const message = data.trim();
       displayMessage({ fromUser: false, message });
       return;
     }
 
+    // SHOW
+    // Message has solidity
     if (
       data.includes("```solidity") &&
       data.includes("pragma solidity ^0.8.0;")
@@ -143,93 +170,110 @@ export default function Chat({
       return;
     }
 
+    // HIDE
+    // Message asks for user input
+    // TODO: this should probably check last from/to agent was Test Fixer instead of seen
     if (
       data.includes(
         "Please give feedback to Client Rep. Press enter or type 'exit' to stop the conversation:"
       ) &&
-      (seenAgents.has("Test Fixer") || seenAgents.has("Test_Fixer"))
+      seenAgents.has("Test Fixer")
     ) {
       setDone(true);
       return;
     }
 
+    // HIDE
+    // Message is to an agent and we don't want the user to interrupt
     if (!agentAvailable()) {
-      // don't display
       console.log("snz3 - no agent available", currentAgent);
       return;
     }
 
+    // HIDE
+    // Message is a tool response
+    // We want to capture this so that we know to send a skip for the next message
     if (data.includes("Response from calling tool")) {
       console.log("snz3 - tool response");
       console.log("about to shift message queue", messageQueue);
-      // ignore
       messageQueue.shift();
       messageQueue.push("snz3:tool_response");
       return;
     }
 
+    // HIDE
+    // Messsage is a delimiter
     if (!parse.isFirstCharAlphanumeric(data)) {
-      // ignore
-      console.log(data);
       console.log("snz3 - not alphanumeric");
       return;
-    } else {
-      const message = data.trim();
+    }
 
-      if (message == sentMessages.pop()) {
-        // this is the user's message
-        return;
-      }
+    const message = data.trim();
 
-      if (message == "start from the top") {
-        // ignore
-        return;
-      }
+    // HIDE
+    // Message is from user
+    console.log("sentMessages", sentMessages);
+    if (message == sentMessages[sentMessages.length - 1]) {
+      sentMessages.pop();
+      return;
+    }
 
-      console.log("about to shift message queue", messageQueue);
-      const lastMessage = messageQueue.shift();
-      messageQueue.push(message);
+    // HIDE
+    // Message indicates a new stage
+    // TODO: might be helpful to capture this to support filtering logic?
+    if (message == "Starting a new chat...") {
+      return;
+    }
 
-      if (message.includes("snz3:tool_response")) {
-        // don't display
-        return;
-      }
+    // HIDE
+    // Message is empty
+    if (message == "") {
+      return;
+    }
 
-      if (lastMessage == "snz3:tool_response") {
-        // don't display
-        return;
-      }
+    // HIDE
+    // The first message we want to display has not been received yet
+    if (
+      messageQueue.length == 0 &&
+      !message.startsWith("Describe your smart contract")
+    ) {
+      return;
+    }
 
-      if (message == "null") {
-        // don't display
-        return;
-      }
+    // Capture the message in the queue and return the top of the queue
+    console.log("about to shift message queue", messageQueue);
+    const lastMessage = messageQueue.shift();
+    messageQueue.push(message);
 
-      if (parse.startsWithArguments(message)) {
-        // don't display
-        return;
-      }
+    // HIDE
+    // Last message indicated a tool response was coming and this message is the actual response to ignore
+    // Note: We don't want to ignore code outputs so we check for that before this line
+    if (lastMessage == "snz3:tool_response") {
+      return;
+    }
 
-      if (parse.startsWithProvideFeeback(message)) {
-        // first, check last message
+    // HIDE
+    // Message starts with "Arguments" related to tool call
+    if (parse.startsWithArguments(message)) {
+      return;
+    }
 
-        if (lastMessage) {
-          if (parse.startsWithArguments(lastMessage)) {
-            // skip and don't display
-            sendSkip();
-            return;
-          } else {
-            return;
-          }
-        } else {
-          // don't display
+    // HIDE
+    // Message asks for user input
+    // Check if it is waiting for the user to confirm a tool call and if so send a skip
+    // TODO: maybe use this to set a variable if the "to" is Client and then show the input field
+    if (parse.startsWithProvideFeeback(message)) {
+      if (lastMessage) {
+        if (parse.startsWithArguments(lastMessage)) {
+          sendSkip();
           return;
         }
       }
-
-      displayMessage({ fromUser: false, message });
       return;
     }
+
+    displayMessage({ fromUser: false, message });
+    return;
   }
 
   function onClose(e: CloseEvent) {
@@ -303,7 +347,7 @@ export default function Chat({
   function send(message: string) {
     console.log("sending", message);
     ws.current?.send(message);
-    sentMessages.push(message);
+    sentMessages.push(message.trim());
   }
 
   function agentAvailable() {
@@ -311,45 +355,45 @@ export default function Chat({
     return (
       currentAgent.includes("Spec") ||
       currentAgent.includes("Contract Reviewer") ||
-      currentAgent.includes("Fixer")
+      currentAgent.includes("Test Fixer")
     );
   }
 
   return (
-    <div className="">
-      <ChatStage agent={currentAgent} />
-      <div className="grid gap-4 max-w-5xl w-[100%] p-10">
+    <div className="container flex flex-col justify-between center h-[100%] my-12">
+      <ChatStage incomingAgent={currentAgent} />
+      <div className="grid gap-4 w-[100%] p-10">
         <div
+          className="max-h-[500px]"
           style={{
-            height: "500px",
             overflowY: "scroll",
           }}
         >
           <ChatMessageContainer messageList={messageList} />
         </div>
-        <div>
-          {done && (
-            <h2 className="scroll-m-20 pb-2 text-3xl tracking-tight first:mt-0 text-gray-400">
-              {"Done! Now you can catch some zzzs 😴"}
-            </h2>
-          )}
-          <div className="ml-auto min-w-[300px] w-1/3">
-            <div className={"grid gap-4" + (done ? " hidden" : "")}>
-              <Label className="font-light text-muted-foreground">
-                {messageList.length == 0
-                  ? "What contracts do you want for your project?"
-                  : "Enter a reply..."}
-              </Label>
-              <InputExpandable inputRef={inputRef} />
-              <ChatButtons
-                restart={restart}
-                agentAvailable={agentAvailable}
-                doneWithSpec={doneWithSpec}
-                handleEnter={handleEnter}
-                loading={loading}
-                proceedToNextAgent={proceedToNextAgent}
-              />
-            </div>
+      </div>
+      <div>
+        {done && (
+          <h2 className="scroll-m-20 pb-2 text-3xl tracking-tight first:mt-0 text-gray-400">
+            {"Done! Now you can catch some zzzs 😴"}
+          </h2>
+        )}
+        <div className="ml-auto min-w-[300px] w-1/3">
+          <div className={"grid gap-4" + (done ? " hidden" : "")}>
+            <Label className="font-light text-muted-foreground">
+              {messageList.length == 0
+                ? "What contracts do you want for your project?"
+                : "Enter a reply..."}
+            </Label>
+            <InputExpandable inputRef={inputRef} />
+            <ChatButtons
+              restart={restart}
+              agentAvailable={agentAvailable}
+              doneWithSpec={doneWithSpec}
+              handleEnter={handleEnter}
+              loading={loading}
+              proceedToNextAgent={proceedToNextAgent}
+            />
           </div>
         </div>
       </div>

@@ -30,15 +30,8 @@ export default function ChatButtons({
       </Tooltip>
       {agentAvailable() ? (
         <>
-          <ButtonSend
-            color={doneWithSpec ? "accent" : "yellow"}
-            onClick={handleEnter}
-            loading={loading}
-          />
-          {doneWithSpec && (
-            <ButtonNext loading={loading} onClick={proceedToNextAgent} />
-          )}
-          <Tooltip content="Skip to next stage">
+          <ButtonSend onClick={handleEnter} loading={loading} />
+          <Tooltip content="Go to next stage">
             <ButtonSkip onClick={proceedToNextAgent} />
           </Tooltip>
         </>

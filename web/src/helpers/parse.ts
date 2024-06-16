@@ -40,13 +40,14 @@ export function includesToClient(message: string) {
   return false;
 }
 
-export function checkAgentMessage(msg: string) {
-  console.log("snz3 - checkAgentMessage");
+export function checkSpeakerMessage(msg: string) {
+  console.log("snz3 - checkSpeakerMessage");
   const message = removeAnsiCodes(msg);
-  const AGENTS_KEYS = Object.keys(AGENTS);
+  const keys = Object.keys(AGENTS);
+
   let agent;
 
-  for (let key of AGENTS_KEYS) {
+  for (let key of keys) {
     const checkThis = key + " (to";
     if (message.includes(checkThis)) {
       agent = key;
