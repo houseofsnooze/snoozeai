@@ -24,9 +24,9 @@ const DESCRIPTIONS = {
     "The agent checks its work. If you want any changes made type them in the chat, otherwise click the arrow to move to the next stage.",
   [AGENTS["Test Writer"]]:
     "The agent spends 2-5 minutes writing tests in JavaScript.",
-  [AGENTS["Test Reviewer"]]: "The agent checks its work.",
   [AGENTS["Test Fixer"]]:
-    "In this last step the agent fixes any issues if the tests fail.",
+    "The agent fixes any issues found in the contracts and tests.",
+  [AGENTS["Test Reviewer"]]: "In this final stage the agent checks its work and makes your files available for download.",
 };
 
 export default function ChatStage({
@@ -35,12 +35,10 @@ export default function ChatStage({
   incomingAgent: string;
 }) {
   const [agent, setAgent] = useState("Spec Writer");
-  const [description, setDescription] = useState(DESCRIPTIONS["Spec Writer"]);
 
   useEffect(() => {
     if (!incomingAgent.includes("Client")) {
       setAgent(incomingAgent);
-      setDescription(DESCRIPTIONS[incomingAgent]);
     }
   }, [incomingAgent]);
 
@@ -66,7 +64,7 @@ export default function ChatStage({
   function renderDescription() {
     return (
       <Alert>
-        <AlertDescription>{description}</AlertDescription>
+        <AlertDescription>{DESCRIPTIONS[agent]}</AlertDescription>
       </Alert>
     );
   }

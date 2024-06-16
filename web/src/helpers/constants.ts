@@ -11,8 +11,8 @@ export const AGENTS = {
   "Contract Writer": "Contract Writer",
   "Contract Reviewer": "Contract Reviewer",
   "Test Writer": "Test Writer",
-  "Test Reviewer": "Test Reviewer",
   "Test Fixer": "Test Fixer",
+  "Test Reviewer": "Test Reviewer",
 };
 
 export const STAGES = {
@@ -20,6 +20,6 @@ export const STAGES = {
   "Contract Writer": "Writing Contract",
   "Contract Reviewer": "Reviewing Contract",
   "Test Writer": "Writing Tests",
-  "Test Reviewer": "Reviewing Tests",
-  "Test Fixer": "Fixing Tests",
+  "Test Fixer": "Reviewing Tests",
+  "Test Reviewer": "Final Review",
 };
