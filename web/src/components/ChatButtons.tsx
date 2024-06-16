@@ -8,7 +8,6 @@ import LoadingSpinner from "./LoadingSpinner";
 
 interface ChatButtonsProps {
   loading: boolean;
-  doneWithSpec: boolean;
   restart: () => void;
   agentAvailable: () => boolean;
   handleEnter: () => void;
@@ -17,7 +16,6 @@ interface ChatButtonsProps {
 
 export default function ChatButtons({
   loading,
-  doneWithSpec,
   restart,
   agentAvailable,
   handleEnter,
@@ -38,7 +36,7 @@ export default function ChatButtons({
       ) : (
         <>
           <Label className="font-light text-muted-foreground">
-            This will only take a minute...
+            This will take a few minutes...
           </Label>
           <LoadingSpinner />
         </>

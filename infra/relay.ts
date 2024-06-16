@@ -74,7 +74,7 @@ function main() {
 
 main();
 
-// Handles conenctions from the client
+// Handles connections from clients
 async function handleClientConnection(websocket: Socket) {
     const clientWsUrl = websocket.conn.remoteAddress;
     console.log(`Client connected: ${clientWsUrl}`);
@@ -163,6 +163,7 @@ async function handleClientConnection(websocket: Socket) {
     });
 };
 
+// Handles connections to agents
 function handleOpen(wsUrl: string, agentWebSocket: WebSocket) {
     console.log('Connected to agent websocket server', wsUrl);
     agentWebSocket.send("start");
@@ -189,9 +190,10 @@ function handleClose(wsUrl: string) {
     console.log('Closed: Connection to agent websocket server was closed', wsUrl);
     connectedAgents.delete(wsUrl);
     agentToClient.delete(wsUrl);
+    // TODO: sent message to client saying the agent disconnected
 }
 
-// Creates client connection to the agent
+// Creates a client connection to the agent
 function connectToAgent(wsUrl: string) {
     console.log('Connecting to agent websocket server', wsUrl);
     const agentWebSocket = new WebSocket(wsUrl);

@@ -40,24 +40,40 @@ export function includesToClient(message: string) {
   return false;
 }
 
-export function checkSpeakerMessage(msg: string) {
+export function includesAvailableAgent(agents?: string[]) {
+  if (agents) {
+    if (agents.length > 0) {
+      return agents.includes("Spec Writer") && agents.includes("Client");
+    }
+  }
+  return true;
+}
+
+export function checkSpeakerMessage(msg: string): {
+  fromAgent: boolean;
+  sender: string;
+  recipient: string;
+} {
   console.log("snz3 - checkSpeakerMessage");
   const message = removeAnsiCodes(msg);
   const keys = Object.keys(AGENTS);
 
-  let agent;
+  let sender = "";
+  let recipient = "";
 
   for (let key of keys) {
     const checkThis = key + " (to";
     if (message.includes(checkThis)) {
-      agent = key;
+      sender = key;
+      recipient = message.split(" (to ")[1].split("):")[0].trim();
       break;
     }
   }
-  if (agent) {
-    return { fromAgent: true, agent: agent };
+
+  if (sender) {
+    return { fromAgent: true, sender, recipient };
   } else {
-    return { fromAgent: false, agent: "" };
+    return { fromAgent: false, sender: "", recipient: "" };
   }
 }
 

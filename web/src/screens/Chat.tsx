@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import ChatMessageContainer from "../components/ChatMessageContainer";
 import { Message as MT } from "../helpers/types";
 import { Socket, io } from "socket.io-client";
-
+import { Button } from "@/components/ui/button";
 import ChatStage from "../components/ChatStage";
 import ChatButtons from "../components/ChatButtons";
 
@@ -15,12 +15,23 @@ import { Label } from "@/components/ui/label";
 
 import "../style/Chat.css";
 
-const messageQueue: string[] = [];
-const sentMessages: string[] = [];
-// Using Spec Writer for the first agent to set chat stage correctly
-let currentAgent: string = "Spec Writer";
-let previousAgent: string = "Client";
-const seenAgents = new Set<string>();
+const initialStates = {
+  messageQueue: [],
+  sentMessages: [],
+  seenAgents: new Set<string>(),
+  // react states
+  currentAgent: "Spec Writer",
+  messageList: [],
+  downloadURL: "",
+  loading: true,
+  ready: false,
+  done: false,
+  reset: false,
+}
+
+const messageQueue: string[] = Object.assign(initialStates.messageQueue);
+const sentMessages: string[] = Object.assign(initialStates.sentMessages);
+const seenAgents = Object.assign(initialStates.seenAgents);
 
 interface ChatProps {
   relayAddress: string;
@@ -39,14 +50,13 @@ export default function Chat({
     agentAddress,
     snoozeApiKey
   );
-  const [messageList, setMessageList] = useState<MT[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [ready, setReady] = useState(false);
-  const [error, setError] = useState(false);
-  const [showStart, setShowStart] = useState(true);
-  const [doneWithSpec, setDoneWithSpec] = useState(false);
-  const [done, setDone] = useState(false);
-  const [reset, setReset] = useState(false);
+  const [loading, setLoading] = useState<boolean>(initialStates.loading);
+  const [ready, setReady] = useState<boolean>(initialStates.ready);
+  const [reset, setReset] = useState<boolean>(initialStates.reset);
+  const [done, setDone] = useState<boolean>(initialStates.done);
+  const [currentAgent, setCurrentAgent] = useState<string>(initialStates.currentAgent);
+  const [downloadURL, setDownloadURL] = useState<string>(initialStates.downloadURL);
+  const [messageList, setMessageList] = useState<MT[]>(initialStates.messageList);
 
   const ws = useRef<Socket | null>(null);
   const inputRef = useRef<HTMLSpanElement | null>(null);
@@ -77,8 +87,6 @@ export default function Chat({
         "let's start from the beginning. Ask me 'What smart contracts should we write today?' Do not precede this question with any other text"
       );
       setReset(false);
-    } else {
-      ready && setShowStart(true);
     }
   }
 
@@ -87,9 +95,12 @@ export default function Chat({
     send("snooz3-pair" + " " + agentAddress + " " + snoozeApiKey);
   }
 
+  // NOTE: The websocket handlers are only constructed once so
+  // they can not read React state correctly.
+  // Do not rely on state variables for logic here such as "currentAgent".
+  // However setting state from here works fine.
   async function onMessage(data: string) {
     console.log("onMessage received:", data);
-    console.log("onMessage current agent:", currentAgent);
 
     if (!data) {
       return;
@@ -112,7 +123,6 @@ export default function Chat({
         message:
           "Error pairing with agent. Please refresh the page and try again.",
       });
-      setError(true);
       return;
     }
 
@@ -122,34 +132,13 @@ export default function Chat({
       console.log("agent-message: ", data);
       const encodedData = encodeURIComponent(data.replace('snooz3-agent: ', '').trim());
       const s3URL = `https://snooze-client-agent-chats-zzz--pastel-de-nata.s3.us-east-2.amazonaws.com/${encodedData}`;
+      setDownloadURL(s3URL);
       displayMessage({
         fromUser: false,
         message:
-          "Agent uploaded artifacts to S3: " + s3URL,
+          `Done! You can now download the spec & code [here](${s3URL}).`,
       });
-      return;
-    }
-
-    // HIDE
-    // Message specifies the sender and recipient of the next message e.g. "Client (to Client Rep):"
-    const { fromAgent, agent } = parse.checkSpeakerMessage(data);
-    if (fromAgent) {
-      console.log(
-        "prev sender:",
-        previousAgent,
-        "curr sender:",
-        currentAgent,
-        "next sender:",
-        agent
-      );
-      // Do not set current agent as client rep or client because it is used for the chat stage
-      // TODO: fix the aforementioned logic to make this less fragile
-      if (agent.includes("Client")) {
-        return;
-      }
-      previousAgent = currentAgent;
-      currentAgent = agent;
-      seenAgents.add(agent);
+      setDone(true);
       return;
     }
 
@@ -172,23 +161,16 @@ export default function Chat({
       return;
     }
 
-    // HIDE
-    // Message asks for user input
-    // TODO: this should probably check last from/to agent was Test Fixer instead of seen
-    if (
-      data.includes(
-        "Please give feedback to Client Rep. Press enter or type 'exit' to stop the conversation:"
-      ) &&
-      seenAgents.has("Test Fixer")
-    ) {
-      setDone(true);
-      return;
-    }
+    const { fromAgent, sender, recipient } = parse.checkSpeakerMessage(data);
 
     // HIDE
-    // Message is to an agent and we don't want the user to interrupt
-    if (!agentAvailable()) {
-      console.log("snz3 - no agent available", currentAgent);
+    // Message specifies the sender and recipient of the next message e.g. "Client (to Client Rep):"
+    if (fromAgent) {
+      if (sender.includes("Client")) {
+        return;
+      }
+      setCurrentAgent(sender);
+      seenAgents.add(sender);
       return;
     }
 
@@ -223,7 +205,7 @@ export default function Chat({
     // HIDE
     // Message indicates a new stage
     // TODO: might be helpful to capture this to support filtering logic?
-    if (message == "Starting a new chat...") {
+    if (message.startsWith("Starting a new chat..")) {
       return;
     }
 
@@ -298,9 +280,6 @@ export default function Chat({
   }
 
   function displayMessage(message: MT) {
-    if (message.message.includes("# User story")) {
-      setDoneWithSpec(true);
-    }
     const lastMessageInList = messageList[messageList.length - 1];
     if (lastMessageInList) {
       console.log("first", message.message);
@@ -325,25 +304,29 @@ export default function Chat({
   }
 
   function proceedToNextAgent() {
-    setDoneWithSpec(false);
     setLoading(true);
     send("exit");
-    if (currentAgent.includes("Test") && currentAgent.includes("Reviewer")) {
+    if (currentAgent.includes("Test Reviewer")) {
       setDone(true);
     }
   }
 
   function restart() {
     send("snooz3-restart");
-    setMessageList([]);
     if (inputRef.current) {
       inputRef.current.innerText = "";
     }
-    setLoading(true);
-    setDone(false);
     messageQueue.length = 0;
     sentMessages.length = 0;
-    setReset(true);
+    seenAgents.clear();
+    // reset react states
+    setLoading(initialStates.loading);
+    setReady(initialStates.ready);
+    setReset(initialStates.reset);
+    setDone(initialStates.done);
+    setCurrentAgent(initialStates.currentAgent);
+    setDownloadURL(initialStates.downloadURL);
+    setMessageList(initialStates.messageList);
   }
 
   function send(message: string) {
@@ -353,12 +336,7 @@ export default function Chat({
   }
 
   function agentAvailable() {
-    // return true;
-    return (
-      currentAgent.includes("Spec") ||
-      currentAgent.includes("Contract Reviewer") ||
-      currentAgent.includes("Test Fixer")
-    );
+    return currentAgent == "Spec Writer";
   }
 
   return (
@@ -375,11 +353,7 @@ export default function Chat({
         </div>
       </div>
       <div>
-        {done && (
-          <h2 className="scroll-m-20 pb-2 text-3xl tracking-tight first:mt-0 text-gray-400">
-            {"Done! Now you can catch some zzzs 😴"}
-          </h2>
-        )}
+        {done && <Button className="w-full uppercase"><a href={downloadURL}>Download Spec & Code</a></Button>}
         <div className="ml-auto min-w-[300px] w-1/3">
           <div className={"grid gap-4" + (done ? " hidden" : "")}>
             <Label className="font-light text-muted-foreground">
@@ -391,7 +365,6 @@ export default function Chat({
             <ChatButtons
               restart={restart}
               agentAvailable={agentAvailable}
-              doneWithSpec={doneWithSpec}
               handleEnter={handleEnter}
               loading={loading}
               proceedToNextAgent={proceedToNextAgent}
