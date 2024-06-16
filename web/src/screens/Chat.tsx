@@ -13,6 +13,8 @@ import * as parse from "../helpers/parse";
 import InputExpandable from "@/components/InputExpandable";
 import { Label } from "@/components/ui/label";
 
+import "../style/Chat.css";
+
 const messageQueue: string[] = [];
 const sentMessages: string[] = [];
 // Using Spec Writer for the first agent to set chat stage correctly
