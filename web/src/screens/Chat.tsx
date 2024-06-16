@@ -115,6 +115,7 @@ export default function Chat({
       return;
     }
 
+
     // SHOW
     // Message indicates pairing failed
     if (data == "snooz3-pair-error") {
@@ -142,6 +143,7 @@ export default function Chat({
       return;
     }
 
+
     // SHOW
     // Message has js code
     if (data.includes("```javascript") && data.includes("const { expect }")) {
@@ -149,6 +151,7 @@ export default function Chat({
       displayMessage({ fromUser: false, message });
       return;
     }
+
 
     // SHOW
     // Message has solidity
@@ -163,6 +166,7 @@ export default function Chat({
 
     const { fromAgent, sender, recipient } = parse.checkSpeakerMessage(data);
 
+
     // HIDE
     // Message specifies the sender and recipient of the next message e.g. "Client (to Client Rep):"
     if (fromAgent) {
@@ -173,6 +177,7 @@ export default function Chat({
       seenAgents.add(sender);
       return;
     }
+
 
     // HIDE
     // Message is a tool response
@@ -217,12 +222,13 @@ export default function Chat({
 
     // HIDE
     // The first message we want to display has not been received yet
-    if (
-      messageQueue.length == 0 &&
-      !message.startsWith("Describe your smart contract")
-    ) {
-      return;
-    }
+    // if (
+    //   messageQueue.length == 0 &&
+    //   !message.startsWith("Describe your smart contract")
+    // ) {
+    //   console.log("The first message we want to display has not been received yet");
+    //   return;
+    // }
 
     // Capture the message in the queue and return the top of the queue
     console.log("about to shift message queue", messageQueue);
