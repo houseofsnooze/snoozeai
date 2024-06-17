@@ -8,8 +8,8 @@ seed = 42
 
 # llm_config = {"model": "gpt-4o", "api_key": os.environ["OPENAI_API_KEY"], "temperature": 0, "timeout": 180, "max_retries": 2, "seed": seed}
 
-llm_config = {"model": "gpt-3.5-turbo-0125", "api_key": os.environ["OPENAI_API_KEY"], "temperature": 0, "timeout": 180, "max_retries": 2, "seed": seed}
-llm_config = {"model": "gpt-4o", "api_key": os.environ["OPENAI_API_KEY"], "temperature": 0, "timeout": 180, "max_retries": 2, "seed": seed}
+# llm_config = {"model": "gpt-3.5-turbo-0125", "api_key": os.environ["OPENAI_API_KEY"], "temperature": 0, "timeout": 180, "max_retries": 2, "seed": seed}
+llm_config = {"model": "gpt-4o", "api_key": os.environ["OPENAI_API_KEY"], "temperature": 0, "seed": seed, "max_retries": 1}
 
 # llm_config = {"model": "gpt-4-turbo", "api_key"  : os.environ["OPENAI_API_KEY"], "temperature": 0, "timeout": 60, "seed": seed}
 
