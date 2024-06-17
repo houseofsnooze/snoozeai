@@ -32,6 +32,7 @@ The next agent will review the tests for quality. """
 test_fixer_message = """Review the specification in zzz/
 Read the smart contracts in zzz/contracts.
 Read the tests in zzz/test. 
+Read the files one by one to avoid rate limit error. 
 Assume the tests and smart contracts are incorrect, and assume the specification is correct, 
 try fixing the tests and/or smart contracts by rewriting them. 
 Save the fixed tests in zzz/test. """
