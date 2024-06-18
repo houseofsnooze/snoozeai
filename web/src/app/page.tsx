@@ -15,7 +15,8 @@ import {
 export default function Main() {
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
-  const [showChat, setShowChat] = useState(false);
+  const [sessionInitiated, setSessionInitiated] = useState(false);
+  const [delay, setDelay] = useState<number>(60);
   const [relayAddress, setRelayAddress] = useState<string>(
     "ws://127.0.0.1:8000"
   );
@@ -39,9 +40,9 @@ export default function Main() {
   }) {
     console.log("Setting up session");
     setLoading(true);
+    setStartCountdown(true);
 
     if (!addresses) {
-      setStartCountdown(true);
       addresses = await requestSession();
     }
 
@@ -50,9 +51,7 @@ export default function Main() {
     setRelayAddress(addresses.relayAddress);
     setAgentAddress(addresses.agentAddress);
     setSnoozeApiKey(addresses.snoozeApiKey);
-
-    setLoading(false);
-    setShowChat(true);
+    setSessionInitiated(true);
   }
 
   /**
@@ -81,15 +80,21 @@ export default function Main() {
     <div className="h-[100vh] flex justify-between flex-col">
       <Nav />
       <main className="flex h-[100vh] flex-col items-center justify-center overflow-hidden">
-        {!ready &&<Home setupSession={setupSession} />}
-         {showChat && <Chat
+        {!ready && <Home setupSession={setupSession} setDelay={setDelay} />}
+        {sessionInitiated && (
+          <Chat
             relayAddress={relayAddress}
             agentAddress={agentAddress}
             snoozeApiKey={snoozeApiKey}
-            ready={() => {setReady(true)}}
-          />}
+            onReady={() => {
+              setReady(true);
+            }}
+          />
+        )}
       </main>
-      {loading && !showChat && <SessionCountdown start={startCountdown} />}
+      {!ready && loading && (
+        <SessionCountdown delay={delay} start={startCountdown} />
+      )}
     </div>
   );
 }

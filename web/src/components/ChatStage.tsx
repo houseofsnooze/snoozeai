@@ -46,7 +46,7 @@ export default function ChatStage({
     return stageKeys.map((stageKey, index) => {
       return (
         <>
-          {index > 0 && <BreadcrumbSeparator key={index * 2} />}
+          {index > 0 && <BreadcrumbSeparator key={index * 10} />}
           <BreadcrumbItem key={index}>
             <Tooltip content={DESCRIPTIONS[stageKey]}>
               <BreadcrumbPage

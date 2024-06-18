@@ -8,9 +8,10 @@ interface HomeProps {
     agentAddress: string;
     snoozeApiKey: string;
   }) => void;
+  setDelay: (delay: number) => void; // seconds. this is passed upstream
 }
 
-export default function Home({ setupSession }: HomeProps) {
+export default function Home({ setupSession, setDelay }: HomeProps) {
   const [showHeader, setShowHeader] = useState(true);
 
   return (
@@ -36,7 +37,11 @@ export default function Home({ setupSession }: HomeProps) {
             </div>
           </div>
         )}
-        <HomeButtons onSubmit={setupSession} setShowHeader={setShowHeader} />
+        <HomeButtons
+          onSubmit={setupSession}
+          setDelay={setDelay}
+          setShowHeader={setShowHeader}
+        />
       </div>
     </div>
   );

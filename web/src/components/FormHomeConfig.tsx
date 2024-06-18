@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import LoadingSpinner from "./LoadingSpinner";
 
 interface FormHomeConfigProps {
   onEnter: (
@@ -11,11 +12,13 @@ interface FormHomeConfigProps {
     snoozeApiKey: string
   ) => void;
   cancel: () => void;
+  loading: boolean;
 }
 
 export default function FormHomeConfig({
   onEnter,
   cancel,
+  loading,
 }: FormHomeConfigProps) {
   const relayAddress = useRef<HTMLInputElement>(null);
   const agentAddress = useRef<HTMLInputElement>(null);
@@ -75,8 +78,9 @@ export default function FormHomeConfig({
         <Button
           onClick={handleClick}
           className="w-fit text-2xl font-bold shadow uppercase"
+          disabled={loading}
         >
-          Enter
+          {loading ? <LoadingSpinner /> : "Enter"}
         </Button>
       </div>
     </div>

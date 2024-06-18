@@ -1,35 +1,35 @@
 import { useEffect, useState } from "react";
 import NotificationTicker from "./NotificationTicker";
+import { useInterval } from "@/lib/useInterval";
 
 interface SessionCountdownProps {
   start: boolean;
+  delay: number; // seconds
+  // onDone: () => void;
 }
 
-export default function SessionCountdown({ start }: SessionCountdownProps) {
-  const [countdown, setCountdown] = useState(60);
+export default function SessionCountdown({
+  start,
+  delay,
+}: SessionCountdownProps) {
+  const [countdown, setCountdown] = useState(delay);
+  const [period, setPeriod] = useState<number | null>(null);
 
   useEffect(() => {
     if (start) {
-      startCountdown();
+      setPeriod(1000);
     }
   }, [start]);
 
-  /**
-   * Start a countdown for setting up the agent session.
-   * When requesting from the central relay this takes less than 1 minute.
-   */
-  function startCountdown() {
-    setCountdown(60);
-    const interval = setInterval(() => {
-      setCountdown((prevCountdown) => {
-        if (prevCountdown <= 1) {
-          clearInterval(interval);
-          return 0;
-        }
-        return prevCountdown - 1;
-      });
-    }, 1000);
-  }
+  useInterval(() => {
+    setCountdown((prevCountdown) => {
+      if (prevCountdown <= 1) {
+        setPeriod(null);
+        return 0;
+      }
+      return prevCountdown - 1;
+    });
+  }, period);
 
   return (
     <NotificationTicker

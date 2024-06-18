@@ -24,6 +24,7 @@ const initialStates = {
   messageList: [],
   downloadURL: "",
   loading: true,
+  ready: false,
   done: false,
   reset: false,
 };
@@ -36,14 +37,14 @@ interface ChatProps {
   relayAddress: string;
   agentAddress: string;
   snoozeApiKey: string;
-  ready: () => void;
+  onReady: () => void;
 }
 
 export default function Chat({
   relayAddress,
   agentAddress,
   snoozeApiKey,
-  ready
+  onReady,
 }: ChatProps) {
   console.log(
     "rendering Chat with: ",
@@ -52,6 +53,7 @@ export default function Chat({
     snoozeApiKey
   );
   const [loading, setLoading] = useState<boolean>(initialStates.loading);
+  const [ready, setReady] = useState<boolean>(initialStates.ready);
   const [reset, setReset] = useState<boolean>(initialStates.reset);
   const [done, setDone] = useState<boolean>(initialStates.done);
   const [currentAgent, setCurrentAgent] = useState<string>(
@@ -99,15 +101,13 @@ export default function Chat({
   function requestPair() {
     console.log("requestPair: ", agentAddress, snoozeApiKey);
     setTimeout(() => {
-<<<<<<< Updated upstream
       console.log("requestPair: 30 seconds passed");
       console.log("requestPair: sending pair request to relay");
       send("snooz3-pair" + " " + agentAddress + " " + snoozeApiKey);
+      setReady(true);
+      onReady();
       send("hi"); // to prompt the agent to send a message back
-=======
-      send("snooz3-pair" + " " + agentAddress + " " + snoozeApiKey);
-      ready();
->>>>>>> Stashed changes
+      setLoading(true);
     }, 30000);
   }
 
@@ -357,43 +357,47 @@ export default function Chat({
     return currentAgent == "Spec Writer";
   }
 
-  return (
-    <div className="container flex flex-col justify-between center h-[100%] my-12">
-      <ChatStage incomingAgent={currentAgent} />
-      <div className="grid gap-4 w-[100%] p-10">
-        <div
-          className="max-h-[500px]"
-          style={{
-            overflowY: "scroll",
-          }}
-        >
-          <ChatMessageContainer messageList={messageList} />
+  if (ready) {
+    return (
+      <div className="container flex flex-col justify-between center h-[100%] my-12">
+        <ChatStage incomingAgent={currentAgent} />
+        <div className="grid gap-4 w-[100%] p-10">
+          <div
+            className="max-h-[500px]"
+            style={{
+              overflowY: "scroll",
+            }}
+          >
+            <ChatMessageContainer messageList={messageList} />
+          </div>
         </div>
-      </div>
-      <div>
-        {done && (
-          <Button className="w-full uppercase">
-            <a href={downloadURL}>Download Spec & Code</a>
-          </Button>
-        )}
-        <div className="ml-auto min-w-[300px] w-1/3">
-          <div className={"grid gap-4" + (done ? " hidden" : "")}>
-            <Label className="font-light text-muted-foreground">
-              {messageList.length == 0
-                ? "What contracts do you want for your project?"
-                : "Enter a reply..."}
-            </Label>
-            <InputExpandable inputRef={inputRef} />
-            <ChatButtons
-              restart={restart}
-              agentAvailable={agentAvailable}
-              handleEnter={handleEnter}
-              loading={loading}
-              proceedToNextAgent={proceedToNextAgent}
-            />
+        <div>
+          {done && (
+            <Button className="w-full uppercase">
+              <a href={downloadURL}>Download Spec & Code</a>
+            </Button>
+          )}
+          <div className="ml-auto min-w-[300px] w-1/3">
+            <div className={"grid gap-4" + (done ? " hidden" : "")}>
+              <Label className="font-light text-muted-foreground">
+                {messageList.length == 0
+                  ? "What contracts do you want for your project?"
+                  : "Enter a reply..."}
+              </Label>
+              <InputExpandable inputRef={inputRef} />
+              <ChatButtons
+                restart={restart}
+                agentAvailable={agentAvailable}
+                handleEnter={handleEnter}
+                loading={loading}
+                proceedToNextAgent={proceedToNextAgent}
+              />
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  } else {
+    return <></>;
+  }
 }

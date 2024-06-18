@@ -9,11 +9,13 @@ interface HomeButtonsProps {
     agentAddress: string;
     snoozeApiKey: string;
   }) => void;
+  setDelay: (delay: number) => void; // seconds
   setShowHeader: (show: boolean) => void;
 }
 
 export default function HomeButtons({
   onSubmit,
+  setDelay,
   setShowHeader,
 }: HomeButtonsProps) {
   const [loading, setLoading] = useState(false);
@@ -23,6 +25,7 @@ export default function HomeButtons({
 
   function handleStart() {
     setLoading(true);
+    setDelay(90); // seconds
     setShowConfigInput(false);
     setShowConfigButton(false);
     onSubmit();
@@ -34,6 +37,7 @@ export default function HomeButtons({
     setShowHeader(false);
   }
   function cancelConfig() {
+    setLoading(false);
     setShowConfigInput(false);
     setShowStartButton(true);
     setShowHeader(true);
@@ -44,6 +48,8 @@ export default function HomeButtons({
     agentAddress: string,
     snoozeApiKey: string
   ) {
+    setLoading(true);
+    setDelay(30); // seconds
     onSubmit({ relayAddress, agentAddress, snoozeApiKey });
   }
 
@@ -68,7 +74,11 @@ export default function HomeButtons({
         </Button>
       )}
       {showConfigInput && (
-        <FormHomeConfig onEnter={submitConfig} cancel={cancelConfig} />
+        <FormHomeConfig
+          onEnter={submitConfig}
+          cancel={cancelConfig}
+          loading={loading}
+        />
       )}
     </div>
   );
