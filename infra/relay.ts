@@ -143,8 +143,18 @@ async function handleClientConnection(websocket: Socket) {
                 return;
             }
             const agentWs = connectedAgents.get(agentWsUrl as string);
-            agentWs?.close();
-            connectToAgent(agentWsUrl);
+            if (!agentWs) {
+                console.error('Agent websocket not found', agentWsUrl);
+            } else {
+                agentWs?.close();
+                if (!connectToAgent(agentWsUrl)) {
+                    websocket.send('snooz3-pair-error agent-not-found');
+                    return;
+                }
+                // pair
+                clientToAgent.set(clientWsUrl, agentWsUrl);
+                agentToClient.set(agentWsUrl, clientWsUrl);
+            }
         } else {
             const agentWsUrl = clientToAgent.get(clientWsUrl);
             const agentWs = connectedAgents.get(agentWsUrl as string);
