@@ -105,7 +105,7 @@ user_rep = ConversableAgent(
                    "You ARE only allowed: 1) ask the AI to save the files 2) reply empty string to let the AI execute tools 3) ask the AI to double check whether files are saved. "
                    "You MUST not propose to the AI that you will save the files, you MUST let the AI save the files by itself. "
                    "If the AI gave you reviewed code in the message, you ask the AI to save the files. "
-                   "If the AI saved the files, you ask the AI to double check whether it saved the files. "
+                   "If the AI saved the files, you ask the AI to double check: **LIST** the directory AND NOT READ THE FILES. "
                    "If the AI said they saved the files and double checked, you reply 'EXIT' to the AI to terminate the conversation. ",
     max_consecutive_auto_reply=20,
     is_termination_msg=exit_pred

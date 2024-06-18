@@ -11,7 +11,7 @@ Your task is to write comprehensive test cases with both unit tests and behavior
 
 * Write high-quality, production-level code. Organize it logically with clear, meaningful names for variables, functions, contracts, and classes.
 * Include proper error handling and logging.
-* Separate test suites into different files.
+* Write all your tests in one file.
 * Comment on the purpose of the test. Comment as much as possible.
 
 # **IMPORTANT: Thoroughness**
