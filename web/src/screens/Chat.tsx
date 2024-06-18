@@ -99,16 +99,17 @@ export default function Chat({
   }
 
   function requestPair() {
-    console.log("requestPair: ", agentAddress, snoozeApiKey);
+    console.log("requestPair will start after delay: ", agentAddress, snoozeApiKey);
     setTimeout(() => {
       console.log("requestPair: 30 seconds passed");
       console.log("requestPair: sending pair request to relay");
       send("snooz3-pair" + " " + agentAddress + " " + snoozeApiKey);
       setReady(true);
       onReady();
-      send("hi"); // to prompt the agent to send a message back
-      setLoading(true);
     }, 30000);
+    setTimeout(() => {
+      send("hi")
+    }, 1000);
   }
 
   // NOTE: The websocket handlers are only constructed once so
