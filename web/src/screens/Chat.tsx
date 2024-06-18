@@ -24,10 +24,9 @@ const initialStates = {
   messageList: [],
   downloadURL: "",
   loading: true,
-  ready: false,
   done: false,
   reset: false,
-}
+};
 
 const messageQueue: string[] = Object.assign(initialStates.messageQueue);
 const sentMessages: string[] = Object.assign(initialStates.sentMessages);
@@ -37,12 +36,14 @@ interface ChatProps {
   relayAddress: string;
   agentAddress: string;
   snoozeApiKey: string;
+  ready: () => void;
 }
 
 export default function Chat({
   relayAddress,
   agentAddress,
   snoozeApiKey,
+  ready
 }: ChatProps) {
   console.log(
     "rendering Chat with: ",
@@ -51,12 +52,17 @@ export default function Chat({
     snoozeApiKey
   );
   const [loading, setLoading] = useState<boolean>(initialStates.loading);
-  const [ready, setReady] = useState<boolean>(initialStates.ready);
   const [reset, setReset] = useState<boolean>(initialStates.reset);
   const [done, setDone] = useState<boolean>(initialStates.done);
-  const [currentAgent, setCurrentAgent] = useState<string>(initialStates.currentAgent);
-  const [downloadURL, setDownloadURL] = useState<string>(initialStates.downloadURL);
-  const [messageList, setMessageList] = useState<MT[]>(initialStates.messageList);
+  const [currentAgent, setCurrentAgent] = useState<string>(
+    initialStates.currentAgent
+  );
+  const [downloadURL, setDownloadURL] = useState<string>(
+    initialStates.downloadURL
+  );
+  const [messageList, setMessageList] = useState<MT[]>(
+    initialStates.messageList
+  );
 
   const ws = useRef<Socket | null>(null);
   const inputRef = useRef<HTMLSpanElement | null>(null);
@@ -93,10 +99,15 @@ export default function Chat({
   function requestPair() {
     console.log("requestPair: ", agentAddress, snoozeApiKey);
     setTimeout(() => {
+<<<<<<< Updated upstream
       console.log("requestPair: 30 seconds passed");
       console.log("requestPair: sending pair request to relay");
       send("snooz3-pair" + " " + agentAddress + " " + snoozeApiKey);
       send("hi"); // to prompt the agent to send a message back
+=======
+      send("snooz3-pair" + " " + agentAddress + " " + snoozeApiKey);
+      ready();
+>>>>>>> Stashed changes
     }, 30000);
   }
 
@@ -116,10 +127,8 @@ export default function Chat({
     // HIDE
     // Message indicates pairing was successful
     if (data == "snooz3-pair-success") {
-      setReady(true);
       return;
     }
-
 
     // SHOW
     // Message indicates pairing failed
@@ -136,18 +145,24 @@ export default function Chat({
     // Message indicates agent uploaded artifacts to S3
     if (data.startsWith("snooz3-agent")) {
       console.log("agent-message: ", data);
-      const encodedData = encodeURIComponent(data.replace('snooz3-agent: ', '').trim());
+      const encodedData = encodeURIComponent(
+        data.replace("snooz3-agent: ", "").trim()
+      );
       const s3URL = `https://snooze-client-agent-chats-zzz--pastel-de-nata.s3.us-east-2.amazonaws.com/${encodedData}`;
       setDownloadURL(s3URL);
       displayMessage({
         fromUser: false,
-        message:
-          `Done! You can now download the spec & code [here](${s3URL}).`,
+        message: `Done! You can now download the spec & code [here](${s3URL}).`,
       });
       setDone(true);
       return;
     }
 
+    // HIDE
+    // Message starts with "Arguments" related to tool call
+    if (data.startsWith("Arguments")) {
+      return;
+    }
 
     // SHOW
     // Message has js code
@@ -156,7 +171,6 @@ export default function Chat({
       displayMessage({ fromUser: false, message });
       return;
     }
-
 
     // SHOW
     // Message has solidity
@@ -171,7 +185,6 @@ export default function Chat({
 
     const { fromAgent, sender, recipient } = parse.checkSpeakerMessage(data);
 
-
     // HIDE
     // Message specifies the sender and recipient of the next message e.g. "Client (to Client Rep):"
     if (fromAgent) {
@@ -182,7 +195,6 @@ export default function Chat({
       seenAgents.add(sender);
       return;
     }
-
 
     // HIDE
     // Message is a tool response
@@ -226,14 +238,10 @@ export default function Chat({
     }
 
     // HIDE
-    // The first message we want to display has not been received yet
-    // if (
-    //   messageQueue.length == 0 &&
-    //   !message.startsWith("Describe your smart contract")
-    // ) {
-    //   console.log("The first message we want to display has not been received yet");
-    //   return;
-    // }
+    // Message is our hardcoded prompt
+    if (message.startsWith("Help me to elaborate")) {
+      return;
+    }
 
     // Capture the message in the queue and return the top of the queue
     console.log("about to shift message queue", messageQueue);
@@ -332,7 +340,6 @@ export default function Chat({
     seenAgents.clear();
     // reset react states
     setLoading(initialStates.loading);
-    setReady(initialStates.ready);
     setReset(initialStates.reset);
     setDone(initialStates.done);
     setCurrentAgent(initialStates.currentAgent);
@@ -364,7 +371,11 @@ export default function Chat({
         </div>
       </div>
       <div>
-        {done && <Button className="w-full uppercase"><a href={downloadURL}>Download Spec & Code</a></Button>}
+        {done && (
+          <Button className="w-full uppercase">
+            <a href={downloadURL}>Download Spec & Code</a>
+          </Button>
+        )}
         <div className="ml-auto min-w-[300px] w-1/3">
           <div className={"grid gap-4" + (done ? " hidden" : "")}>
             <Label className="font-light text-muted-foreground">

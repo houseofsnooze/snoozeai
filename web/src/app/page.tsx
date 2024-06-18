@@ -14,7 +14,8 @@ import {
 
 export default function Main() {
   const [loading, setLoading] = useState(false);
-  const [running, setRunning] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [showChat, setShowChat] = useState(false);
   const [relayAddress, setRelayAddress] = useState<string>(
     "ws://127.0.0.1:8000"
   );
@@ -51,7 +52,7 @@ export default function Main() {
     setSnoozeApiKey(addresses.snoozeApiKey);
 
     setLoading(false);
-    setRunning(true);
+    setShowChat(true);
   }
 
   /**
@@ -80,16 +81,15 @@ export default function Main() {
     <div className="h-[100vh] flex justify-between flex-col">
       <Nav />
       <main className="flex h-[100vh] flex-col items-center justify-center overflow-hidden">
-        {!running && <Home setupSession={setupSession} />}
-        {running && (
-          <Chat
+        {!ready &&<Home setupSession={setupSession} />}
+         {showChat && <Chat
             relayAddress={relayAddress}
             agentAddress={agentAddress}
             snoozeApiKey={snoozeApiKey}
-          />
-        )}
+            ready={() => {setReady(true)}}
+          />}
       </main>
-      {loading && !running && <SessionCountdown start={startCountdown} />}
+      {loading && !showChat && <SessionCountdown start={startCountdown} />}
     </div>
   );
 }
