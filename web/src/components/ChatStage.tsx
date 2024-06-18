@@ -18,15 +18,15 @@ const defaultClasses = "text-foreground font-bold";
 
 const DESCRIPTIONS = {
   [AGENTS["Spec Writer"]]:
-    "Answer 5-7 questions about your contract. If you are satisfied with the spec click the arrows on the right to move to the next stage.",
+    "Answer 5-7 questions about your contract. If you are satisfied with the spec click the ⏩ arrows on the right to move to the next stage.",
   [AGENTS["Contract Writer"]]: "The agent spends 2-3 minutes writing Solidity.",
-  [AGENTS["Contract Reviewer"]]:
-    "The agent checks its work. If you want any changes made type them in the chat, otherwise click the arrow to move to the next stage.",
+  [AGENTS["Contract Reviewer"]]: "The agent checks its work.",
   [AGENTS["Test Writer"]]:
     "The agent spends 2-5 minutes writing tests in JavaScript.",
   [AGENTS["Test Fixer"]]:
     "The agent fixes any issues found in the contracts and tests.",
-  [AGENTS["Test Reviewer"]]: "In this final stage the agent checks its work and makes your files available for download.",
+  [AGENTS["Test Reviewer"]]:
+    "In this final stage the agent checks its work and makes your files available for download.",
 };
 
 export default function ChatStage({

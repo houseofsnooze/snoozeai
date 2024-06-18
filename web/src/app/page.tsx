@@ -4,7 +4,7 @@ import { useState } from "react";
 import Home from "../screens/Home";
 import Chat from "../screens/Chat";
 import Nav from "../components/Nav";
-import NotificationTicker from "../components/NotificationTicker";
+import SessionCountdown from "../components/SessionCountdown";
 import {
   CENTRAL_RELAY_URL,
   SNOOZE_AGENT_URL_KEY,
@@ -22,7 +22,7 @@ export default function Main() {
     "ws://127.0.0.1:1337"
   );
   const [snoozeApiKey, setSnoozeApiKey] = useState<string>(DUMMY_API_KEY);
-  const [countdown, setCountdown] = useState(60);
+  const [startCountdown, setStartCountdown] = useState(false);
 
   /**
    * Setup the agent session.
@@ -40,7 +40,7 @@ export default function Main() {
     setLoading(true);
 
     if (!addresses) {
-      startCountdown();
+      setStartCountdown(true);
       addresses = await requestSession();
     }
 
@@ -52,23 +52,6 @@ export default function Main() {
 
     setLoading(false);
     setRunning(true);
-  }
-
-  /**
-   * Start a countdown for setting up the agent session.
-   * When requesting from the central relay this takes less than 1 minute.
-   */
-  function startCountdown() {
-    setCountdown(60);
-    const interval = setInterval(() => {
-      setCountdown((prevCountdown) => {
-        if (prevCountdown <= 1) {
-          clearInterval(interval);
-          return 0;
-        }
-        return prevCountdown - 1;
-      });
-    }, 1000);
   }
 
   /**
@@ -106,11 +89,7 @@ export default function Main() {
           />
         )}
       </main>
-      {loading && !running && (
-        <NotificationTicker
-          notification={`Starting your AI agent session. ${countdown} seconds remain. Please keep this page open.`}
-        />
-      )}
+      {loading && !running && <SessionCountdown start={startCountdown} />}
     </div>
   );
 }
