@@ -198,8 +198,8 @@ function handleError(error: ErrorEvent) {
 }
 function handleClose(wsUrl: string) {
     console.log('Closed: Connection to agent websocket server was closed', wsUrl);
-    connectedAgents.delete(wsUrl);
-    agentToClient.delete(wsUrl);
+    // restart just reconnects to the same websocket server on the agent
+    // do not delete the map entry
     // TODO: sent message to client saying the agent disconnected
 }
 
