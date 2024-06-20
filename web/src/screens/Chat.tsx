@@ -99,7 +99,11 @@ export default function Chat({
   }
 
   function requestPair() {
-    console.log("requestPair will start after delay: ", agentAddress, snoozeApiKey);
+    console.log(
+      "requestPair will start after delay: ",
+      agentAddress,
+      snoozeApiKey
+    );
     setTimeout(() => {
       console.log("requestPair: 30 seconds passed");
       console.log("requestPair: sending pair request to relay");
@@ -108,7 +112,7 @@ export default function Chat({
       onReady();
     }, 30000);
     setTimeout(() => {
-      send("hi")
+      send("hi");
     }, 1000);
   }
 

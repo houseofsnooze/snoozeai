@@ -1,14 +1,18 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import FormHomeConfig from "./FormHomeConfig";
+import FormHomeStart from "./FormHomeStart";
 import LoadingSpinner from "./LoadingSpinner";
+import { saveUser, checkValidAccessCode } from "../lib/api";
 
 interface HomeButtonsProps {
-  onSubmit: (addresses?: {
-    relayAddress: string;
-    agentAddress: string;
-    snoozeApiKey: string;
-  }) => void;
+  onSubmit: (
+    accessCode: string,
+    addresses?: {
+      relayAddress: string;
+      agentAddress: string;
+    }
+  ) => void;
   setDelay: (delay: number) => void; // seconds
   setShowHeader: (show: boolean) => void;
 }
@@ -20,15 +24,49 @@ export default function HomeButtons({
 }: HomeButtonsProps) {
   const [loading, setLoading] = useState(false);
   const [showStartButton, setShowStartButton] = useState(true);
+  const [showStartInput, setShowStartInput] = useState(false);
   const [showConfigInput, setShowConfigInput] = useState(false);
   const [showConfigButton, setShowConfigButton] = useState(true);
 
   function handleStart() {
+    setShowStartInput(true);
+    setShowStartButton(false);
+    setShowConfigButton(false);
+  }
+  function cancelStart() {
+    setLoading(false);
+    setShowStartInput(false);
+    setShowStartButton(true);
+    setShowConfigButton(true);
+  }
+
+  async function submitStart({
+    emailAddress,
+    telegramHandle,
+    accessCode,
+  }: {
+    emailAddress: string;
+    telegramHandle: string;
+    accessCode: string;
+  }) {
     setLoading(true);
     setDelay(90); // seconds
-    setShowConfigInput(false);
+    setShowStartInput(false);
     setShowConfigButton(false);
-    onSubmit();
+    const user = { email: emailAddress, telegramHandle: telegramHandle };
+    const saved = await saveUser(user);
+    if (!saved) {
+      console.error("Failed to save user");
+    } else {
+      console.log("Saved user");
+    }
+    // TODO: check valid access code
+    // const valid = await checkValidAccessCode(accessCode);
+    // if(!valid) {
+    //   console.error("Invalid access code");
+    //   return;
+    // }
+    onSubmit(accessCode);
   }
 
   function handleConfig() {
@@ -46,16 +84,18 @@ export default function HomeButtons({
   function submitConfig(
     relayAddress: string,
     agentAddress: string,
-    snoozeApiKey: string
+    accessCode: string
   ) {
     setLoading(true);
     setDelay(30); // seconds
-    onSubmit({ relayAddress, agentAddress, snoozeApiKey });
+    setShowConfigInput(false);
+    // TODO: check valid access code
+    onSubmit(accessCode, { relayAddress, agentAddress });
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      {showStartButton && (
+    <div className="flex flex-col gap-4 w-fit">
+      {showStartButton && !showStartInput && (
         <Button
           onClick={handleStart}
           className="w-fit text-2xl font-bold shadow uppercase"
@@ -64,13 +104,20 @@ export default function HomeButtons({
           {loading ? <LoadingSpinner /> : "Start"}
         </Button>
       )}
+      {showStartInput && (
+        <FormHomeStart
+          onEnter={submitStart}
+          cancel={cancelStart}
+          loading={loading}
+        />
+      )}
       {!showConfigInput && showConfigButton && (
         <Button
           onClick={handleConfig}
           className="w-fit text-2xl font-bold shadow uppercase"
           variant={"outline"}
         >
-          Configure
+          {loading ? <LoadingSpinner /> : "Configure"}
         </Button>
       )}
       {showConfigInput && (

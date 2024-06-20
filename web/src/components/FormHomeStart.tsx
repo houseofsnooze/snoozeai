@@ -6,32 +6,54 @@ import { Input } from "@/components/ui/input";
 import LoadingSpinner from "./LoadingSpinner";
 import { DUMMY_API_KEY } from "@/helpers/constants";
 
-interface FormHomeConfigProps {
-  onEnter: (
-    relayAddress: string,
-    agentAddress: string,
-    snoozeApiKey: string
-  ) => void;
+interface FormHomeStartProps {
+  onEnter: ({
+    emailAddress,
+    telegramHandle,
+    accessCode,
+  }: {
+    emailAddress: string;
+    telegramHandle: string;
+    accessCode: string;
+  }) => void;
   cancel: () => void;
   loading: boolean;
 }
 
-export default function FormHomeConfig({
+export default function FormHomeStart({
   onEnter,
   cancel,
   loading,
-}: FormHomeConfigProps) {
-  const relayAddress = useRef<HTMLInputElement>(null);
-  const agentAddress = useRef<HTMLInputElement>(null);
-  const snoozeApiKey = useRef<HTMLInputElement>(null);
+}: FormHomeStartProps) {
+  const emailRef = useRef<HTMLInputElement>(null);
+  const telegramRef = useRef<HTMLInputElement>(null);
+  const accessCodeRef = useRef<HTMLInputElement>(null);
 
   function handleClick() {
-    if (relayAddress.current && agentAddress.current && snoozeApiKey.current) {
-      onEnter(
-        relayAddress.current.value,
-        agentAddress.current.value,
-        snoozeApiKey.current.value
-      );
+    if (emailRef.current && telegramRef.current && accessCodeRef.current) {
+      const emailAddress = emailRef.current.value.trim();
+      const telegramHandle = telegramRef.current.value.trim();
+      const accessCode = accessCodeRef.current.value.trim();
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailAddress || emailAddress == "") {
+        console.log("email is empty");
+        return;
+      } else if (!emailRegex.test(emailAddress)) {
+        console.log("email is not in a valid format");
+        return;
+      }
+
+      if (!accessCode || accessCode == "") {
+        console.log("access code is empty");
+        return;
+      }
+
+      onEnter({
+        emailAddress,
+        telegramHandle,
+        accessCode,
+      });
     }
     return;
   }
@@ -40,24 +62,22 @@ export default function FormHomeConfig({
     <div className="space-y-4">
       <div>
         <label className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-          relay address
+          email
         </label>
         <Input
           className="text-xl"
-          ref={relayAddress}
-          placeholder="ws://127.0.0.1:8000"
-          defaultValue="ws://127.0.0.1:8000"
+          ref={emailRef}
+          placeholder="email@example.com"
         />
       </div>
       <div>
         <label className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-          agent address
+          telegram handle
         </label>
         <Input
           className="text-xl"
-          ref={agentAddress}
-          placeholder="ws://127.0.0.1:1337"
-          defaultValue="ws://127.0.0.1:1337"
+          ref={telegramRef}
+          placeholder="telegram_handle"
         />
       </div>
       <div>
@@ -66,12 +86,12 @@ export default function FormHomeConfig({
         </label>
         <Input
           className="text-xl"
-          ref={snoozeApiKey}
+          ref={accessCodeRef}
           placeholder="zzz-zzz-zzz-zzz-zzz"
           defaultValue={DUMMY_API_KEY}
         />
       </div>
-      <div className="flex gap-2 mt-4">
+      <div className="flex gap-2">
         {!loading && (
           <Button
             onClick={cancel}

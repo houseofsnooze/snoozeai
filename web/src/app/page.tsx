@@ -33,11 +33,13 @@ export default function Main() {
    *
    * @param addresses Relay and agent websocket urls
    */
-  async function setupSession(addresses?: {
-    relayAddress: string;
-    agentAddress: string;
-    snoozeApiKey: string;
-  }) {
+  async function setupSession(
+    accessCode: string,
+    addresses?: {
+      relayAddress: string;
+      agentAddress: string;
+    }
+  ) {
     console.log("Setting up session");
     setLoading(true);
     setStartCountdown(true);
@@ -50,7 +52,7 @@ export default function Main() {
     window.localStorage.setItem(SNOOZE_AGENT_URL_KEY, addresses.agentAddress);
     setRelayAddress(addresses.relayAddress);
     setAgentAddress(addresses.agentAddress);
-    setSnoozeApiKey(addresses.snoozeApiKey);
+    setSnoozeApiKey(accessCode);
     setSessionInitiated(true);
   }
 
@@ -61,7 +63,6 @@ export default function Main() {
   async function requestSession(): Promise<{
     relayAddress: string;
     agentAddress: string;
-    snoozeApiKey: string;
   }> {
     console.log("Requesting session from central relay");
     const resp = await fetch(`https://${CENTRAL_RELAY_URL}/start`, {
@@ -72,7 +73,6 @@ export default function Main() {
     return {
       relayAddress: CENTRAL_RELAY_URL,
       agentAddress: data.wsUrl,
-      snoozeApiKey: DUMMY_API_KEY,
     };
   }
 
