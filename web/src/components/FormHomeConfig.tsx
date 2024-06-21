@@ -4,7 +4,6 @@ import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import LoadingSpinner from "./LoadingSpinner";
-import { DUMMY_API_KEY } from "@/helpers/constants";
 
 interface FormHomeConfigProps {
   onEnter: (
@@ -68,7 +67,6 @@ export default function FormHomeConfig({
           className="text-xl"
           ref={snoozeApiKey}
           placeholder="zzz-zzz-zzz-zzz-zzz"
-          defaultValue={DUMMY_API_KEY}
         />
       </div>
       <div className="flex gap-2 mt-4">
