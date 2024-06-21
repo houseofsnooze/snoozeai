@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import FormHomeConfig from "./FormHomeConfig";
 import FormHomeStart from "./FormHomeStart";
 import LoadingSpinner from "./LoadingSpinner";
-import { saveUser, checkValidAccessCode } from "../lib/api";
+import * as api from "../lib/api";
 
 interface HomeButtonsProps {
   onSubmit: (
@@ -54,18 +54,16 @@ export default function HomeButtons({
     setShowStartInput(false);
     setShowConfigButton(false);
     const user = { email: emailAddress, telegramHandle: telegramHandle };
-    const saved = await saveUser(user);
+    const saved = await api.saveUser(user);
     if (!saved) {
       console.error("Failed to save user");
-    } else {
-      console.log("Saved user");
+      return;
     }
-    // TODO: check valid access code
-    // const valid = await checkValidAccessCode(accessCode);
-    // if(!valid) {
-    //   console.error("Invalid access code");
-    //   return;
-    // }
+    const valid = await api.checkValidAccessCode(accessCode);
+    if (!valid) {
+      console.error("Invalid access code");
+      return;
+    }
     onSubmit(accessCode);
   }
 
@@ -81,7 +79,7 @@ export default function HomeButtons({
     setShowHeader(true);
   }
 
-  function submitConfig(
+  async function submitConfig(
     relayAddress: string,
     agentAddress: string,
     accessCode: string
@@ -89,7 +87,11 @@ export default function HomeButtons({
     setLoading(true);
     setDelay(30); // seconds
     setShowConfigInput(false);
-    // TODO: check valid access code
+    const valid = await api.checkValidAccessCode(accessCode);
+    if (!valid) {
+      console.error("Invalid access code");
+      return;
+    }
     onSubmit(accessCode, { relayAddress, agentAddress });
   }
 
