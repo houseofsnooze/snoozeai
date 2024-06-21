@@ -47,6 +47,11 @@ export async function issueAccessCode(code: string): Promise<boolean> {
   return false;
 }
 
+/**
+ * Revokes an access code by setting its active flag to false
+ * @param code
+ * @returns True if the access code is revoked
+ */
 export async function revokeAccessCode(code: string): Promise<boolean> {
   try {
     const data = await kv.hgetall(`accessCode:${code}`);

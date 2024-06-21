@@ -30,7 +30,6 @@ export default function HomeButtons({
 
   function handleStart() {
     setShowStartInput(true);
-    setShowStartButton(false);
     setShowConfigButton(false);
   }
   function cancelStart() {
@@ -50,9 +49,6 @@ export default function HomeButtons({
     accessCode: string;
   }) {
     setLoading(true);
-    setDelay(90); // seconds
-    setShowStartInput(false);
-    setShowConfigButton(false);
     const user = { email: emailAddress, telegramHandle: telegramHandle };
     const saved = await api.saveUser(user);
     if (!saved) {
@@ -64,6 +60,8 @@ export default function HomeButtons({
       console.error("Invalid access code");
       return;
     }
+    setDelay(90); // seconds
+    setShowStartInput(false);
     onSubmit(accessCode);
   }
 
