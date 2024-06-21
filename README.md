@@ -71,3 +71,18 @@ aws ecr get-login-password --region us-east-2 | docker login --username AWS --pa
 docker push 084782361886.dkr.ecr.us-east-2.amazonaws.com/snooz3-dev:relay-ts
 ```
 
+## Scripts
+
+From `web` directory you can run scripts with ts-node:
+
+```
+npx ts-node scripts/issue-access-code ray-sizl
+```
+
+```
+npx ts-node scripts/revoke-access-code ray-sizl
+```
+
+```
+npx ts-node scripts/check-access-code ray-sizl
+```
