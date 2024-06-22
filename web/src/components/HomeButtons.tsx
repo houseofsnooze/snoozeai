@@ -57,7 +57,7 @@ export default function HomeButtons({
     }
     const valid = await api.checkValidAccessCode(accessCode);
     if (!valid) {
-      console.error("Invalid access code");
+      alert("Invalid access code");
       return;
     }
     setDelay(90); // seconds
