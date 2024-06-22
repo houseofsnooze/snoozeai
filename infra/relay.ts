@@ -51,6 +51,8 @@ function main() {
         }
         const { wsUrl, taskId } = session;
         connectToAgent(wsUrl);
+        const ip = wsUrl.split('ws://')[1].split(':')[0];
+        postToAgent(ip, 'taskid', JSON.stringify(taskId));
         res.send({ taskId, wsUrl });
         return;
     });
@@ -74,6 +76,22 @@ function main() {
 
 main();
 
+// takes a websocket url, make a HTTP POST to the IP, path and with payload
+async function postToAgent(ip: string, path: string, payload: string, port: number = 8080) {
+    const url = `http://${ip}:${port}/${path}`;
+    console.log(`postToAgent - POST to agent: ${url} with payload ${payload}`);
+    await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: payload,
+    })
+        .then(resp => resp.json())
+        .then(data => { console.log('response from POST to agent: ', data); })
+        .catch((error) => { console.error('error from POST to agent', error); });
+}
+
 // Handles connections from clients
 async function handleClientConnection(websocket: Socket) {
     const clientWsUrl = websocket.conn.remoteAddress;
@@ -96,28 +114,9 @@ async function handleClientConnection(websocket: Socket) {
             }
             // TODO: this is a hack, need to get the ip from the agent ws url
             // agentWsUrl: ws://172.17.0.2:1337
-            const domain = agentWsUrl.split('ws://')[1].split(':')[0];
-            const portAgent = 8080;
-
-            console.log('ws-message: sending api key to agent ', agentWsUrl, apikey);
-
+            const ip = agentWsUrl.split('ws://')[1].split(':')[0];
             const payload = JSON.stringify({ apikey });
-            console.log('ws-message: payload ', payload);
-            await fetch(`http://${domain}:${portAgent}/apikey`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: payload,
-            })
-                .then(resp => resp.json())
-                .then(data => {
-                    console.log('response for POST /apikey: ', data);
-                })
-                .catch((error) => {
-                    console.error('Error sending api key to agent', error);
-                });
-
+            await postToAgent(ip, 'apikey', payload);
 
             // pairing agent
             console.log("Pairing to agent...")
