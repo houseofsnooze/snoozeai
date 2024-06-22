@@ -110,10 +110,10 @@ export default function Chat({
       send("snooz3-pair" + " " + agentAddress + " " + snoozeApiKey);
       setReady(true);
       onReady();
+      setTimeout(() => {
+        send("hi");
+      }, 5000);
     }, 30000);
-    setTimeout(() => {
-      send("hi");
-    }, 1000);
   }
 
   // NOTE: The websocket handlers are only constructed once so
