@@ -85,10 +85,12 @@ export default function HomeButtons({
     setLoading(true);
     setDelay(30); // seconds
     setShowConfigInput(false);
-    const valid = await api.checkValidAccessCode(accessCode);
-    if (!valid) {
-      console.error("Invalid access code");
-      return;
+    if (window.location.hostname !== "localhost") {
+      const valid = await api.checkValidAccessCode(accessCode);
+      if (!valid) {
+        console.error("Invalid access code");
+        return;
+      }
     }
     onSubmit(accessCode, { relayAddress, agentAddress });
   }
