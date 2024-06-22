@@ -38,103 +38,119 @@ register_tools()
 
 def on_connect(iostream: IOWebsockets) -> None:
     global restart_flag
+    try: 
+        print(f"on_connect: Connected to client using IOWebsockets {iostream}", flush=True)
+        print(
+            f"on_connect: Initiating chat with agent {agents.user_proxy}",
+            flush=True,
+        )
 
-    print(f"on_connect: Connected to client using IOWebsockets {iostream}", flush=True)
-    print(
-        f"on_connect: Initiating chat with agent {agents.user_proxy}",
-        flush=True,
-    )
+        initial_msg = iostream.input()
+        print(f"on_connect: initial_msg: {initial_msg}", flush=True)
 
-    initial_msg = iostream.input()
-    print(f"on_connect: initial_msg: {initial_msg}", flush=True)
+        chat_results = agents.user_proxy.initiate_chats([
+            {
+                "recipient": agents.spec_writer,
+                "message": prompts.spec_writer_message,
+                "summary_method": "reflection_with_llm",
+            },
+            {
+                "sender": agents.user_rep,
+                "recipient": agents.contract_writer,
+                "message": prompts.contract_writer_message,
+                "summary_method": "reflection_with_llm",
+                "max_turns": 20
+            },
+            {
+                "sender": agents.user_rep,
+                "recipient": agents.contract_reviewer,
+                "message": prompts.contract_reviewer_message,
+                "summary_method": "reflection_with_llm",
+                "max_turns": 20
+            },
+            {
+                "sender": agents.user_rep,
+                "recipient": agents.test_writer,
+                "message": prompts.test_writer_message,
+                "summary_method": "reflection_with_llm",
+                "max_turns": 20
+            },
+            {
+                "sender": agents.user_rep,
+                "recipient": agents.test_fixer,
+                "message": prompts.test_fixer_message,
+                "summary_method": "reflection_with_llm",
+                "max_turns": 20
+            },
+            {
+                "sender": agents.user_rep,
+                "recipient": agents.test_reviewer,
+                "message": prompts.test_reviewer_message,
+                "summary_method": "reflection_with_llm",
+                "max_turns": 20
+            },
+        ])
 
-    chat_results = agents.user_proxy.initiate_chats([
-        {
-            "recipient": agents.spec_writer,
-            "message": prompts.spec_writer_message,
-            "summary_method": "reflection_with_llm",
-        },
-        {
-            "sender": agents.user_rep,
-            "recipient": agents.contract_writer,
-            "message": prompts.contract_writer_message,
-            "summary_method": "reflection_with_llm",
-            "max_turns": 20
-        },
-        {
-            "sender": agents.user_rep,
-            "recipient": agents.contract_reviewer,
-            "message": prompts.contract_reviewer_message,
-            "summary_method": "reflection_with_llm",
-            "max_turns": 20
-        },
-        {
-            "sender": agents.user_rep,
-            "recipient": agents.test_writer,
-            "message": prompts.test_writer_message,
-            "summary_method": "reflection_with_llm",
-            "max_turns": 20
-        },
-        {
-            "sender": agents.user_rep,
-            "recipient": agents.test_fixer,
-            "message": prompts.test_fixer_message,
-            "summary_method": "reflection_with_llm",
-            "max_turns": 20
-        },
-        {
-            "sender": agents.user_rep,
-            "recipient": agents.test_reviewer,
-            "message": prompts.test_reviewer_message,
-            "summary_method": "reflection_with_llm",
-            "max_turns": 20
-        },
-    ])
+        print("on_connect: finishing chats", flush=True)
+        
+        autogen.runtime_logging.stop()
+        dir = 'zzz/'
+        
+        #### Save chat_history and cost to zzz/
+        if hasattr(chat_results, 'chat_history'):
+            pprint.pprint(chat_results.chat_history)
+            with open(f"{dir}/chat_history.json", "w") as f:
+                f.write(json.dumps(chat_results.chat_history))    
+                
+        if hasattr(chat_results, 'cost'):
+            pprint.pprint(chat_results.cost)
+            with open(f"{dir}/chat_costs.json", "w") as f:
+                f.write(json.dumps(chat_results.cost))
 
-    print("on_connect: finishing chats", flush=True)
-    
-    autogen.runtime_logging.stop()
-    dir = 'zzz/'
-    
-    #### Save chat_history and cost to zzz/
-    if hasattr(chat_results, 'chat_history'):
-        pprint.pprint(chat_results.chat_history)
-        with open(f"{dir}/chat_history.json", "w") as f:
-            f.write(json.dumps(chat_results.chat_history))    
-            
-    if hasattr(chat_results, 'cost'):
-        pprint.pprint(chat_results.cost)
-        with open(f"{dir}/chat_costs.json", "w") as f:
-            f.write(json.dumps(chat_results.cost))
+        #### Save zzz/ to S3
+        
+        current_time = datetime.datetime.now(datetime.UTC).isoformat(timespec='seconds')
+        zip = f"zzz.{apikey}.{current_time}.zip"
+        
+        iostream.print(f"snooz3-agent: {zip}", flush=True)
+        print(f"on_connect: saving to S3. zip: {zip}, bucket: {bucket}")
+        
+        # Create a ZipFile Object
+        with zipfile.ZipFile(zip, 'w') as zipObj:
+            # Iterate over all the files in directory
+            for foldername, subfolders, filenames in os.walk(dir):
+                for filename in filenames:
+                    # Create complete filepath of file in directory
+                    filePath = os.path.join(foldername, filename)
+                    # Add file to zip
+                    zipObj.write(filePath)
 
-    #### Save zzz/ to S3
-    
-    current_time = datetime.datetime.now(datetime.UTC).isoformat(timespec='seconds')
-    zip = f"zzz.{apikey}.{current_time}.zip"
-    
-    iostream.print(f"snooz3-agent: {zip}", flush=True)
-    print(f"on_connect: saving to S3. zip: {zip}, bucket: {bucket}")
-    
-    # Create a ZipFile Object
-    with zipfile.ZipFile(zip, 'w') as zipObj:
-        # Iterate over all the files in directory
-        for foldername, subfolders, filenames in os.walk(dir):
-            for filename in filenames:
-                # Create complete filepath of file in directory
-                filePath = os.path.join(foldername, filename)
-                # Add file to zip
-                zipObj.write(filePath)
+        # Create an S3 client
+        s3 = boto3.client('s3')
 
-    # Create an S3 client
-    s3 = boto3.client('s3')
-
-    # Uploads the given file using a managed uploader, which will split up large
-    # files automatically and upload parts in parallel.
-    s3.upload_file(zip, bucket, zip)
-    
-    print(f"on_connect: saved succesfully to S3. zip: {zip}, bucket: {bucket}")
-    
-
+        # Uploads the given file using a managed uploader, which will split up large
+        # files automatically and upload parts in parallel.
+        s3.upload_file(zip, bucket, zip)
+        
+        print(f"on_connect: saved succesfully to S3. zip: {zip}, bucket: {bucket}")     
+    except Exception as e:
+        raise e
+    finally:
+        taskid = '8ddf0bb891e2486e8f46023254a24754'
+        # try stopping the ECS task
+        if taskid is None:
+            return
+        # Stop the ECS task using boto3
+        try:
+            ecs_client = boto3.client('ecs', region_name='us-east-2')
+            response = ecs_client.stop_task(
+                cluster='snooz3-dev',
+                task=taskid,
+                reason='Task completed'
+            )
+            print(f"Stopped ECS task: {taskid}, response: {response}")
+        except Exception as e:
+            print(f"Failed to stop ECS task: {taskid}, error: {e}")
 
 async def start_server():
     global ws_ctx
