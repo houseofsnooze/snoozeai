@@ -27,6 +27,7 @@ print("Logging session ID: " + str(logging_session_id))
 # Global variable to store the server context manager
 ws_ctx = None
 apikey = None
+taskid = None
 
 # S3 bucket name
 bucket = 'snooze-client-agent-chats-zzz--pastel-de-nata'
@@ -166,6 +167,17 @@ async def set_apikey(_apikey: ApiKey):
     print(f"apikey: {_apikey.apikey}")
     apikey = _apikey.apikey
     return {"status": "apikey received", "apikey": _apikey.apikey}
+
+class ECSTaskID(BaseModel):
+    taskid: str
+
+@app.post("/taskid")
+async def set_apikey(_taskid: ECSTaskID):
+    global taskid
+    print(f"ecs-taskid: {_taskid.taskid}")
+    taskid = _taskid.taskid
+    return {"status": "taskid received", "taskid": _taskid.taskid}
+
 
 @app.get("/")
 async def get():
