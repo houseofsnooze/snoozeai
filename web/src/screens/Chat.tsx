@@ -112,7 +112,7 @@ export default function Chat({
       onReady();
       setTimeout(() => {
         send("hi");
-      }, 5000);
+      }, 3000);
     }, 30000);
   }
 
