@@ -136,7 +136,6 @@ def on_connect(iostream: IOWebsockets) -> None:
     except Exception as e:
         raise e
     finally:
-        taskid = '8ddf0bb891e2486e8f46023254a24754'
         # try stopping the ECS task
         if taskid is None:
             return
