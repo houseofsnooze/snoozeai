@@ -100,12 +100,13 @@ def on_connect(iostream: IOWebsockets) -> None:
         if hasattr(chat_results, 'chat_history'):
             pprint.pprint(chat_results.chat_history)
             with open(f"{dir}/chat_history.json", "w") as f:
-                f.write(json.dumps(chat_results.chat_history))    
-                
+                f.write(json.dumps(chat_results.chat_history))
+                f.flush()    
         if hasattr(chat_results, 'cost'):
             pprint.pprint(chat_results.cost)
             with open(f"{dir}/chat_costs.json", "w") as f:
                 f.write(json.dumps(chat_results.cost))
+                f.flush()
 
         #### Save zzz/ to S3
         
@@ -113,7 +114,7 @@ def on_connect(iostream: IOWebsockets) -> None:
         zip = f"zzz.{apikey}.{current_time}.zip"
         
         iostream.print(f"snooz3-agent: {zip}", flush=True)
-        print(f"on_connect: saving to S3. zip: {zip}, bucket: {bucket}")
+        print(f"on_connect: saving to S3. zip: {zip}, bucket: {bucket}", flush=True)
         
         # Create a ZipFile Object
         with zipfile.ZipFile(zip, 'w') as zipObj:
@@ -132,7 +133,7 @@ def on_connect(iostream: IOWebsockets) -> None:
         # files automatically and upload parts in parallel.
         s3.upload_file(zip, bucket, zip)
         
-        print(f"on_connect: saved succesfully to S3. zip: {zip}, bucket: {bucket}")     
+        print(f"on_connect: saved succesfully to S3. zip: {zip}, bucket: {bucket}", flush=True)     
     except Exception as e:
         raise e
     finally:
@@ -147,9 +148,9 @@ def on_connect(iostream: IOWebsockets) -> None:
                 task=taskid,
                 reason='Task completed'
             )
-            print(f"Stopped ECS task: {taskid}, response: {response}")
+            print(f"Stopped ECS task: {taskid}, response: {response}", flush=True)
         except Exception as e:
-            print(f"Failed to stop ECS task: {taskid}, error: {e}")
+            print(f"Failed to stop ECS task: {taskid}, error: {e}", flush=True)
 
 async def start_server():
     global ws_ctx
