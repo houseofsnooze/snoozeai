@@ -53,7 +53,7 @@ function main() {
         connectToAgent(wsUrl);
         const ip = wsUrl.split('ws://')[1].split(':')[0];
         setTimeout(
-            () => postToAgent(ip, 'taskid', JSON.stringify({ taskId })),
+            () => postToAgent(ip, 'taskid', JSON.stringify({ "taskid": taskId })),
             30000
         )
         res.send({ taskId, wsUrl });
