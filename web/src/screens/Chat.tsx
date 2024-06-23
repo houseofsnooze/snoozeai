@@ -208,10 +208,11 @@ export default function Chat({
 
     // HIDE
     // Messsage is a delimiter
-    if (!parse.isFirstCharAlphanumeric(data)) {
-      console.log("snz3 - not alphanumeric");
-      return;
-    }
+    // Commenting out because questions are skipped sometimes eg "**Question 2: xyz**"
+    // if (!parse.isFirstCharAlphanumeric(data)) {
+    //   console.log("snz3 - not alphanumeric");
+    //   return;
+    // }
 
     const message = data.trim();
 
