@@ -163,12 +163,6 @@ export default function Chat({
       return;
     }
 
-    // HIDE
-    // Message starts with "Arguments" related to tool call
-    if (data.startsWith("Arguments")) {
-      return;
-    }
-
     // SHOW
     // Message has js code
     if (data.includes("```javascript") && data.includes("const { expect }")) {
