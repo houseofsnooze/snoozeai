@@ -55,7 +55,7 @@ export function checkSpeakerMessage(msg: string): {
   recipient: string;
 } {
   console.log("snz3 - checkSpeakerMessage");
-  const message = removeAnsiCodes(msg);
+  const { output: message, replaced } = removeAnsiCodes(msg);
   const keys = Object.keys(AGENTS);
 
   let sender = "";
@@ -81,7 +81,13 @@ export function isFirstCharAlphanumeric(input: string) {
   return /^[a-zA-Z0-9#`]/.test(input);
 }
 
+export function isDelimiter(input: string) {
+  return /^[-*>#]{5,}/.test(input);
+}
+
 export function removeAnsiCodes(input: string) {
   const ansiEscapeCodePattern = /\u001b\[[0-9;]*m/g;
-  return input.replace(ansiEscapeCodePattern, "");
+  const output = input.replace(ansiEscapeCodePattern, "");
+  const replaced = input.length !== output.length;
+  return { output, replaced };
 }

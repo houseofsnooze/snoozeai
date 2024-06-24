@@ -16,8 +16,9 @@ import { Label } from "@/components/ui/label";
 import "../style/Chat.css";
 
 const initialStates = {
-  messageQueue: [],
+  messagesToTrack: [],
   sentMessages: [],
+  receivedAndDisplayedMessages: [],
   seenAgents: new Set<string>(),
   // react states
   currentAgent: "Spec Writer",
@@ -29,7 +30,10 @@ const initialStates = {
   reset: false,
 };
 
-const messageQueue: string[] = Object.assign(initialStates.messageQueue);
+const messagesToTrack: string[] = Object.assign(initialStates.messagesToTrack);
+const receivedAndDisplayedMessages: string[] = Object.assign(
+  initialStates.receivedAndDisplayedMessages
+);
 const sentMessages: string[] = Object.assign(initialStates.sentMessages);
 const seenAgents = Object.assign(initialStates.seenAgents);
 
@@ -116,10 +120,14 @@ export default function Chat({
     }, 30000);
   }
 
-  // NOTE: The websocket handlers are only constructed once so
-  // they can not read React state correctly.
-  // Do not rely on state variables for logic here such as "currentAgent".
-  // However setting state from here works fine.
+  // IMPORTANT: Do not rely on React state variables for logic in
+  // these websocket handlers.
+  //
+  // The websocket handlers are only constructed once so they can not
+  // read React state correctly.
+  // For example, "currentAgent" will not be correct here.
+  //
+  // However setting React state from here works fine.
   async function onMessage(data: string) {
     console.log("onMessage received:", data);
 
@@ -127,7 +135,11 @@ export default function Chat({
       return;
     }
 
-    data = parse.removeAnsiCodes(data);
+    // Strip colors but don't ignore their data in case they are
+    // things we want to track like tool calls
+    const { output, replaced } = parse.removeAnsiCodes(data);
+    data = output;
+    const hadAnsiCodes = replaced;
 
     // HIDE
     // Message indicates pairing was successful
@@ -142,6 +154,7 @@ export default function Chat({
         fromUser: false,
         message:
           "Error pairing with agent. Please refresh the page and try again.",
+        custom: true,
       });
       return;
     }
@@ -158,6 +171,7 @@ export default function Chat({
       displayMessage({
         fromUser: false,
         message: `Done! You can now download the spec & code [here](${s3URL}).`,
+        custom: true,
       });
       setDone(true);
       return;
@@ -185,7 +199,9 @@ export default function Chat({
     const { fromAgent, sender, recipient } = parse.checkSpeakerMessage(data);
 
     // HIDE
-    // Message specifies the sender and recipient of the next message e.g. "Client (to Client Rep):"
+    // Message is a debug log with sender and recipient
+    //
+    // e.g. "Client (to Client Rep):"
     if (fromAgent) {
       if (sender.includes("Client")) {
         return;
@@ -195,45 +211,32 @@ export default function Chat({
       return;
     }
 
-    // HIDE
-    // Message is a tool response
-    // We want to capture this so that we know to send a skip for the next message
-    if (data.includes("Response from calling tool")) {
-      console.log("snz3 - tool response");
-      console.log("about to shift message queue", messageQueue);
-      messageQueue.shift();
-      messageQueue.push("snz3:tool_response");
-      return;
-    }
-
-    // HIDE
-    // Messsage is a delimiter
-    // Commenting out because questions are skipped sometimes eg "**Question 2: xyz**"
-    // if (!parse.isFirstCharAlphanumeric(data)) {
-    //   console.log("snz3 - not alphanumeric");
-    //   return;
-    // }
+    // --------------------------------------
+    // Below we filter on the trimmed message
+    // --------------------------------------
 
     const message = data.trim();
 
     // HIDE
+    // Message is empty
+    if (message == "") {
+      return;
+    }
+
+    // HIDE
     // Message is from user
-    console.log("sentMessages", sentMessages);
-    if (message == sentMessages[sentMessages.length - 1]) {
+    if (message.trim() == sentMessages[sentMessages.length - 1].trim()) {
+      console.log("sentMessages", sentMessages);
       sentMessages.pop();
       return;
     }
 
     // HIDE
     // Message indicates a new stage
-    // TODO: might be helpful to capture this to support filtering logic?
+    //
+    // TODO: might be helpful to capture this as a new chat between
+    // different agents to support filtering logic?
     if (message.startsWith("Starting a new chat..")) {
-      return;
-    }
-
-    // HIDE
-    // Message is empty
-    if (message == "") {
       return;
     }
 
@@ -243,21 +246,68 @@ export default function Chat({
       return;
     }
 
-    // Capture the message in the queue and return the top of the queue
-    console.log("about to shift message queue", messageQueue);
-    const lastMessage = messageQueue.shift();
-    messageQueue.push(message);
-
     // HIDE
-    // Last message indicated a tool response was coming and this message is the actual response to ignore
-    // Note: We don't want to ignore code outputs so we check for that before this line
-    if (lastMessage == "snz3:tool_response") {
+    // Message is a tool response
+    //
+    // We capture this so that we know to ignore the next message
+    //
+    // NOTE: Before this line we check for code snippets so that
+    // we always display code.
+    if (message.includes("Response from calling tool")) {
+      console.log("snz3 - tool response");
+      console.log("about to shift messagesToTrack", messagesToTrack);
+      messagesToTrack.shift();
+      messagesToTrack.push("snz3:tool_response");
       return;
     }
 
     // HIDE
-    // Message starts with "Arguments" related to tool call
+    // Message starts with "Arguments"
+    //
+    // We capture this so we know to send a skip after the next message
     if (parse.startsWithArguments(message)) {
+      console.log("snz3 - found arguments");
+      console.log("about to shift messagesToTrack", messagesToTrack);
+      messagesToTrack.shift();
+      messagesToTrack.push("snz3:tool_arguments");
+      return;
+    }
+
+    // HIDE
+    // Message is a debug log or delimiter
+    //
+    // because it is not alphanumeric and had ansi codes
+    //
+    // NOTE: This must go below tool call responses.
+    //
+    // A debug log could be `***** Suggested tool call`
+    // OR `***** Response from calling`
+    // so we check tool responses above this statement
+    // so we know when to send skips.
+    if (
+      (!parse.isFirstCharAlphanumeric(message) && hadAnsiCodes) ||
+      parse.isDelimiter(message)
+    ) {
+      console.log("snz3 - found delimiter or debug log");
+      return;
+    }
+
+    // -------------------------------------------------
+    // Below we look at the last message tracked to see
+    // if this new message is waiting for a tool call or
+    // is a tool response.
+    // -------------------------------------------------
+
+    // Capture the message and return the top of the queue
+    console.log("about to shift messagesToTrack", messagesToTrack);
+    const lastMessage = messagesToTrack.shift();
+    messagesToTrack.push(message);
+
+    // HIDE
+    // Last message indicated a tool response
+    //
+    // This message is the actual response to ignore
+    if (lastMessage == "snz3:tool_response") {
       return;
     }
 
@@ -267,7 +317,7 @@ export default function Chat({
     // TODO: maybe use this to set a variable if the "to" is Client and then show the input field
     if (parse.startsWithProvideFeeback(message)) {
       if (lastMessage) {
-        if (parse.startsWithArguments(lastMessage)) {
+        if (lastMessage == "snz3:tool_arguments") {
           sendSkip();
           return;
         }
@@ -307,8 +357,13 @@ export default function Chat({
         return;
       }
     }
+    if (!message.custom && !message.fromUser) {
+      receivedAndDisplayedMessages.push(message.message);
+    }
     setMessageList((prev) => [...prev, message]);
-    setLoading(false);
+    if (!message.fromUser) {
+      setLoading(false);
+    }
   }
 
   function handleEnter() {
@@ -335,7 +390,8 @@ export default function Chat({
     if (inputRef.current) {
       inputRef.current.innerText = "";
     }
-    messageQueue.length = 0;
+    messagesToTrack.length = 0;
+    receivedAndDisplayedMessages.length = 0;
     sentMessages.length = 0;
     seenAgents.clear();
     // reset react states
