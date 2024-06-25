@@ -225,10 +225,12 @@ export default function Chat({
 
     // HIDE
     // Message is from user
-    if (message.trim() == sentMessages[sentMessages.length - 1].trim()) {
-      console.log("sentMessages", sentMessages);
-      sentMessages.pop();
-      return;
+    if (sentMessages.length > 0) {
+      if (message.trim() == sentMessages[sentMessages.length - 1].trim()) {
+        console.log("sentMessages", sentMessages);
+        sentMessages.pop();
+        return;
+      }
     }
 
     // HIDE
