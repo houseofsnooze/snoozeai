@@ -115,8 +115,13 @@ export default function Chat({
       setReady(true);
       onReady();
       setTimeout(() => {
-        send("hi");
-      }, 3000);
+        console.log(`messageList = ${messageList}`);
+        if (messageList.length === 0) {
+          console.log('messageList length === 0');
+          console.log('request restart connection to agent');
+          restart();
+        }
+      }, 5000);
     }, 30000);
   }
 
