@@ -115,6 +115,7 @@ export default function Chat({
       setReady(true);
       onReady();
       setTimeout(() => {
+        console.log("requestPair: 5 seconds passed")
         console.log(`messageList = ${messageList}`);
         if (messageList.length === 0) {
           console.log('messageList length === 0');
