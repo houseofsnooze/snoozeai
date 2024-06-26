@@ -123,7 +123,7 @@ export default function Chat({
           restart();
         }
       }, 5000);
-    }, 30000);
+    }, 45000);
   }
 
   // IMPORTANT: Do not rely on React state variables for logic in
