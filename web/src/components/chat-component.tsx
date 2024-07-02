@@ -67,12 +67,12 @@ export function ChatComponent({
         onSubmit={handleSubmit}
         className="bg-background border-t border-muted px-4 py-3 sticky bottom-0 w-full"
       >
-        <div>
+        <div className="container">
           <ChatStage incomingAgent={currentAgent} />
           <div className="flex space-x-2">
-            <button>
+            {/* <button>
               <ButtonTrash onClick={onRestart} />
-            </button>
+            </button> */}
             <div className="relative w-full">
               <Textarea
                 placeholder="Enter a reply..."
@@ -80,21 +80,10 @@ export function ChatComponent({
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
               />
-              {/* <InputExpandable
-                inputRef={inputRef}
-                disabled={loading}
-              /> */}
             </div>
             <button>
               <ButtonSend onClick={handleSubmit} loading={loading} />
             </button>
-            {/* <Button
-              type="submit"
-              className={`flex-1 text-xl uppercase font-bold shadow bg-yellow hover:bg-yellow/90 mx-2 gap-2`}
-            >
-              <span>Send</span>
-              <SendIcon className="w-5 h-5" />
-            </Button> */}
             <Tooltip content="Go to next stage">
               <ButtonSkip onClick={proceedToNextAgent} />
             </Tooltip>
@@ -102,26 +91,6 @@ export function ChatComponent({
         </div>
       </form>
     </div>
-  );
-}
-
-function SendIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m22 2-7 20-4-9-9-4Z" />
-      <path d="M22 2 11 13" />
-    </svg>
   );
 }
 
