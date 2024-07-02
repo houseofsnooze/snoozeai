@@ -24,6 +24,8 @@ export function ChatComponent({
   onSubmit,
   proceedToNextAgent,
   currentAgent,
+  done,
+  downloadURL,
 }: {
   inputRef: React.RefObject<HTMLSpanElement>;
   loading: boolean;
@@ -32,6 +34,8 @@ export function ChatComponent({
   onSubmit: (message: string) => void;
   proceedToNextAgent: () => void;
   currentAgent: string;
+  done: boolean;
+  downloadURL: string;
 }) {
   const [input, setInput] = useState("");
   const { containerRef, messagesRef, scrollToBottom } = useScrollAnchor();
@@ -70,32 +74,37 @@ export function ChatComponent({
         }}
         className="bg-background border-t border-muted px-4 py-3 sticky bottom-0 w-full"
       >
-        <div className="container">
-          <ChatStage incomingAgent={currentAgent} />
-          <div className="flex space-x-2">
-            {/* <button>
-              <ButtonTrash onClick={onRestart} />
-            </button> */}
-            <div className="relative w-full">
-              <Textarea
-                placeholder="Enter a reply..."
-                disabled={loading}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-              />
-            </div>
-            <div>
-              <ButtonSend onClick={handleSubmit} loading={loading} />
-            </div>
-            {
-              currentAgent === AGENTS["Spec Writer"] && (
-            <div>
-              <ButtonSkip onClick={proceedToNextAgent} />
-            </div>
-              )
-            }
+        {done && (
+          <div className="container">
+            <Button className="w-full uppercase">
+              <a href={downloadURL}>Download Spec & Code</a>
+            </Button>
           </div>
-        </div>
+        )}
+        {!done && (
+          <div className="container">
+            <div className="flex space-x-2">
+              <div className="relative w-full">
+                <Textarea
+                  placeholder="Enter a reply..."
+                  disabled={loading}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                />
+              </div>
+              <div>
+                <ButtonSend onClick={handleSubmit} loading={loading} />
+              </div>
+              {
+                currentAgent === AGENTS["Spec Writer"] && (
+                  <div>
+                    <ButtonSkip onClick={proceedToNextAgent} />
+                  </div>
+                )
+              }
+            </div>
+          </div>
+        )}
       </form>
     </div>
   );

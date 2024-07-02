@@ -418,10 +418,6 @@ export default function Chat({
     sentMessages.push(message.trim());
   }
 
-  function agentAvailable() {
-    return currentAgent == "Spec Writer";
-  }
-
   if (ready) {
     return (
       <ChatComponent
@@ -432,6 +428,8 @@ export default function Chat({
         onRestart={restart}
         proceedToNextAgent={proceedToNextAgent}
         currentAgent={currentAgent}
+        done={done}
+        downloadURL={downloadURL}
       />
     );
   } else {
