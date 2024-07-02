@@ -54,7 +54,7 @@ export const useScrollAnchor = () => {
       if (container.scrollTop < lastScrollRef.current) setHasNotScrolled(false);
       lastScrollRef.current = container.scrollTop;
     },
-    containerRef,
+    containerRef
   );
 
   return {

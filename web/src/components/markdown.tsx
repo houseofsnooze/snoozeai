@@ -5,5 +5,5 @@ export const MemoizedReactMarkdown: React.FC<Options> = React.memo(
   ReactMarkdown,
   (prevProps, nextProps) =>
     prevProps.children === nextProps.children &&
-    prevProps.className === nextProps.className,
+    prevProps.className === nextProps.className
 );

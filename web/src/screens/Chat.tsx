@@ -463,9 +463,19 @@ export default function Chat({
   //     </div>
   //   );
   // } else {
-    if (ready) {
-      return <ChatComponent loading={loading} messages={messageList} onSubmit={handleEnter} />;
-    } else {
-      return <div>Loading...</div>;
-    }
+  if (ready) {
+    return (
+      <ChatComponent
+        inputRef={inputRef}
+        loading={loading}
+        messages={messageList}
+        onSubmit={handleEnter}
+        onRestart={restart}
+        proceedToNextAgent={proceedToNextAgent}
+        currentAgent={currentAgent}
+      />
+    );
+  } else {
+    return;
+  }
 }
