@@ -16,10 +16,10 @@ export const AGENTS = {
 };
 
 export const STAGES = {
-  "Spec Writer": "Writing Specification",
-  "Contract Writer": "Writing Contract",
-  "Contract Reviewer": "Reviewing Contract",
-  "Test Writer": "Writing Tests",
-  "Test Fixer": "Reviewing Tests",
-  "Test Reviewer": "Final Review",
+  [AGENTS["Spec Writer"]]: "Writing Specification",
+  [AGENTS["Contract Writer"]]: "Writing Contract",
+  [AGENTS["Contract Reviewer"]]: "Reviewing Contract",
+  [AGENTS["Test Writer"]]: "Writing Tests",
+  [AGENTS["Test Fixer"]]: "Reviewing Tests",
+  [AGENTS["Test Reviewer"]]: "Final Review",
 };

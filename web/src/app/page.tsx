@@ -77,23 +77,25 @@ export default function Main() {
   }
 
   return (
-    <div className="h-[100vh] flex justify-between flex-col">
+    <div>
       <Nav />
-      <main className="flex h-[100vh] flex-col items-center justify-center overflow-hidden">
-        {!ready && <Home setupSession={setupSession} setDelay={setDelay} />}
-        {sessionInitiated && (
-          <Chat
-            relayAddress={relayAddress}
-            agentAddress={agentAddress}
-            snoozeApiKey={snoozeApiKey}
-            onReady={() => {
-              setReady(true);
-            }}
-          />
-        )}
-      </main>
-      {!ready && loading && (
-        <SessionCountdown delay={delay} start={startCountdown} />
+      {!ready && (
+        <main className="flex h-[100vh] flex-col items-center justify-center overflow-hidden">
+          <Home setupSession={setupSession} setDelay={setDelay} />
+          {!ready && loading && (
+            <SessionCountdown delay={delay} start={startCountdown} />
+          )}
+        </main>
+      )}
+      {sessionInitiated && (
+        <Chat
+          relayAddress={relayAddress}
+          agentAddress={agentAddress}
+          snoozeApiKey={snoozeApiKey}
+          onReady={() => {
+            setReady(true);
+          }}
+        />
       )}
     </div>
   );

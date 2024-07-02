@@ -14,6 +14,7 @@ import InputExpandable from "@/components/InputExpandable";
 import { Label } from "@/components/ui/label";
 
 import "../style/Chat.css";
+import { ChatComponent } from "@/components/chat-component";
 
 const initialStates = {
   messagesToTrack: [],
@@ -374,10 +375,10 @@ export default function Chat({
     }
   }
 
-  function handleEnter() {
+  function handleEnter(message: string) {
     console.log("snz3 - handle enter");
     setLoading(true);
-    const message = inputRef.current?.innerText || "";
+    // const message = inputRef.current?.innerText || "";
     setMessageList((prev) => [...prev, { fromUser: true, message }]);
     send(message);
     if (inputRef.current) {
@@ -423,45 +424,17 @@ export default function Chat({
 
   if (ready) {
     return (
-      <div className="container flex flex-col justify-between center h-[100%] my-12">
-        <ChatStage incomingAgent={currentAgent} />
-        <div className="grid gap-4 w-[100%] p-10">
-          <div
-            className="max-h-[500px]"
-            style={{
-              overflowY: "scroll",
-            }}
-          >
-            <ChatMessageContainer messageList={messageList} />
-          </div>
-        </div>
-        <div>
-          {done && (
-            <Button className="w-full uppercase">
-              <a href={downloadURL}>Download Spec & Code</a>
-            </Button>
-          )}
-          <div className="ml-auto min-w-[300px] w-1/3">
-            <div className={"grid gap-4" + (done ? " hidden" : "")}>
-              <Label className="font-light text-muted-foreground">
-                {messageList.length == 0
-                  ? "What contracts do you want for your project?"
-                  : "Enter a reply..."}
-              </Label>
-              <InputExpandable inputRef={inputRef} />
-              <ChatButtons
-                restart={restart}
-                agentAvailable={agentAvailable}
-                handleEnter={handleEnter}
-                loading={loading}
-                proceedToNextAgent={proceedToNextAgent}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+      <ChatComponent
+        inputRef={inputRef}
+        loading={loading}
+        messages={messageList}
+        onSubmit={handleEnter}
+        onRestart={restart}
+        proceedToNextAgent={proceedToNextAgent}
+        currentAgent={currentAgent}
+      />
     );
   } else {
-    return <></>;
+    return;
   }
 }

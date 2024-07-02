@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import NotificationTicker from "./NotificationTicker";
 import { useInterval } from "@/lib/useInterval";
 
@@ -32,8 +33,11 @@ export default function SessionCountdown({
   }, period);
 
   return (
-    <NotificationTicker
-      notification={`Starting your AI agent session. ${countdown} seconds remain. Please keep this page open.`}
-    />
+    <Alert>
+      <AlertTitle>Loading...</AlertTitle>
+      <AlertDescription>
+        {`Starting your AI agent session. ${countdown} seconds remain. Please keep this page open.`}
+      </AlertDescription>
+    </Alert>
   );
 }
