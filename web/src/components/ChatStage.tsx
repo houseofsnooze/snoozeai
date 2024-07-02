@@ -49,11 +49,11 @@ export default function ChatStage({
           {index > 0 && <BreadcrumbSeparator key={index * 10} />}
           <BreadcrumbItem key={index}>
             <Tooltip content={DESCRIPTIONS[stageKey]}>
-              <BreadcrumbPage
+              <div
                 className={agent === stageKey ? defaultClasses : mutedClasses}
               >
                 {STAGES[stageKey as keyof typeof STAGES]}
-              </BreadcrumbPage>
+              </div>
             </Tooltip>
           </BreadcrumbItem>
         </>

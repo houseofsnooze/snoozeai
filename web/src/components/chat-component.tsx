@@ -14,6 +14,7 @@ import ChatStage from "./ChatStage";
 import { Message } from "@/helpers/types";
 import InputExpandable from "./InputExpandable";
 import { Textarea } from "./ui/textarea";
+import { AGENTS } from "@/helpers/constants";
 
 export function ChatComponent({
   inputRef,
@@ -64,7 +65,9 @@ export function ChatComponent({
         </div>
       </div>
       <form
-        onSubmit={handleSubmit}
+        onSubmit={(e) => {
+          e.preventDefault();
+        }}
         className="bg-background border-t border-muted px-4 py-3 sticky bottom-0 w-full"
       >
         <div className="container">
@@ -81,12 +84,16 @@ export function ChatComponent({
                 onChange={(e) => setInput(e.target.value)}
               />
             </div>
-            <button>
+            <div>
               <ButtonSend onClick={handleSubmit} loading={loading} />
-            </button>
-            <Tooltip content="Go to next stage">
+            </div>
+            {
+              currentAgent === AGENTS["Spec Writer"] && (
+            <div>
               <ButtonSkip onClick={proceedToNextAgent} />
-            </Tooltip>
+            </div>
+              )
+            }
           </div>
         </div>
       </form>
