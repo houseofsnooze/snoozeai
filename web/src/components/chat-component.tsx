@@ -58,8 +58,9 @@ export function ChatComponent({
             messages.map((m, i) =>
               m.fromUser ? (
                 <UserMessage key={i} message={m} />
-              ) :
+              ) : (
                 <BotMessage key={i} message={m} />
+              )
             )
           ) : (
             <div className="mx-auto my-auto text-center w-full max-w-md flex items-center justify-center h-full">
@@ -75,12 +76,10 @@ export function ChatComponent({
         <div>
           <div className="flex space-x-2">
             <div className="relative w-full">
-              <Input
-                placeholder="Type your message..."
-                className="w-full rounded-lg pr-16 resize-none"
+              <Textarea
+                placeholder="Enter a reply..."
                 disabled={loading}
                 value={input}
-                min={8}
                 onChange={(e) => setInput(e.target.value)}
               />
               <Button
