@@ -10,6 +10,7 @@ import ButtonSend from "./ButtonSend";
 import ButtonSkip from "./ButtonSkip";
 import Tooltip from "./Tooltip";
 import ChatStage from "./ChatStage";
+import FormDownload from "./FormDownload";
 
 import { Message } from "@/helpers/types";
 import InputExpandable from "./InputExpandable";
@@ -75,11 +76,15 @@ export function ChatComponent({
         className="bg-background border-t border-muted px-4 py-3 sticky bottom-0 w-full"
       >
         {done && (
-          <div className="container">
-            <Button className="w-full uppercase">
-              <a href={downloadURL}>Download Spec & Code</a>
-            </Button>
-          </div>
+          <FormDownload>
+            <div className="container">
+              <Button className="w-full uppercase">
+                <a href={downloadURL !== "" ? downloadURL : "#"}>
+                  Download Spec & Code
+                </a>
+              </Button>
+            </div>
+          </FormDownload>
         )}
         {!done && (
           <div className="container">
@@ -95,13 +100,11 @@ export function ChatComponent({
               <div>
                 <ButtonSend onClick={handleSubmit} loading={loading} />
               </div>
-              {
-                currentAgent === AGENTS["Spec Writer"] && (
-                  <div>
-                    <ButtonSkip onClick={proceedToNextAgent} />
-                  </div>
-                )
-              }
+              {currentAgent === AGENTS["Spec Writer"] && (
+                <div>
+                  <ButtonSkip onClick={proceedToNextAgent} />
+                </div>
+              )}
             </div>
           </div>
         )}
