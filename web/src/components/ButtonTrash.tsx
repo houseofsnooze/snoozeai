@@ -8,7 +8,8 @@ interface ButtonTrashProps {
 const ButtonTrash = React.forwardRef<HTMLButtonElement, ButtonTrashProps>(
   ({ onClick }, ref) => {
     return (
-      <Button ref={ref} onClick={onClick} variant="ghost">
+      <Button ref={ref} onClick={onClick} variant="ghost" className="gap-2">
+        <span className="uppercase">Restart</span>
         <svg
           style={{ color: "slategray" }}
           xmlns="http://www.w3.org/2000/svg"
