@@ -82,6 +82,9 @@ export default function Main() {
       {!ready && (
         <main className="flex h-[100vh] flex-col items-center justify-center overflow-hidden">
           <Home setupSession={setupSession} setDelay={setDelay} />
+          {!ready && loading && (
+            <SessionCountdown delay={delay} start={startCountdown} />
+          )}
         </main>
       )}
       {sessionInitiated && (
@@ -93,9 +96,6 @@ export default function Main() {
             setReady(true);
           }}
         />
-      )}
-      {!ready && loading && (
-        <SessionCountdown delay={delay} start={startCountdown} />
       )}
     </div>
   );
