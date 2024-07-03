@@ -1,8 +1,6 @@
 from tools import fs
 from agents import agents
 
-from tools.agent import run_tests, init_tests
-
 def register_tools():
     agents.user_proxy.register_for_execution(name="list_files")(fs.list_files)
     agents.user_proxy.register_for_execution(name="read_file")(fs.read_file)
