@@ -120,8 +120,8 @@ export default function Chat({
         console.log(`messageList = ${messageList}`);
         if (messageList.length === 0) {
           console.log('messageList length === 0');
-          // console.log('request restart connection to agent');
-          // restart();
+          console.log('request restart connection to agent');
+          restart();
         }
       }, 5000);
     }, 45000);
