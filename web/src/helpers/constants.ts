@@ -23,3 +23,8 @@ export const STAGES = {
   [AGENTS["Test Fixer"]]: "Reviewing Tests",
   [AGENTS["Test Reviewer"]]: "Final Review",
 };
+
+export const PAIR_DELAY_MS = 5000;
+export const RESTART_DELAY_MS = 5000;
+export const STARTUP_DELAY_MS = PAIR_DELAY_MS + RESTART_DELAY_MS;
+export const CONFIG_STARTUP_DELAY_MS = RESTART_DELAY_MS;

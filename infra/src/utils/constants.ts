@@ -1,0 +1,1 @@
+export const TASK_STARTED_BY = "central-relay";
