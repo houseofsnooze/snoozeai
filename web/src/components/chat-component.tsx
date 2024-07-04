@@ -59,7 +59,11 @@ export function ChatComponent({
               m.fromUser ? (
                 <UserMessage key={i} message={m} />
               ) : (
-                <BotMessage key={i} message={m} />
+                <BotMessage
+                  key={i}
+                  message={m}
+                  agentChatter={currentAgent != AGENTS["Spec Writer"]}
+                />
               )
             )
           ) : (
@@ -91,22 +95,29 @@ export function ChatComponent({
         )}
         {!done && (
           <div className="container">
+            <ChatStage incomingAgent={currentAgent} />
             <div className="flex space-x-2">
               <div className="relative w-full">
                 <Textarea
-                  placeholder="Enter a reply..."
-                  disabled={loading}
+                  placeholder={
+                    currentAgent != AGENTS["Spec Writer"]
+                      ? "The agents are talking to each other! Feel free to take a nap while they finish up."
+                      : "Enter a reply..."
+                  }
+                  disabled={loading || currentAgent != AGENTS["Spec Writer"]}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                 />
               </div>
-              <div>
-                <ButtonSend onClick={handleSubmit} loading={loading} />
-              </div>
               {currentAgent === AGENTS["Spec Writer"] && (
-                <div>
-                  <ButtonSkip onClick={proceedToNextAgent} />
-                </div>
+                <>
+                  <div>
+                    <ButtonSend onClick={handleSubmit} loading={loading} />
+                  </div>
+                  <div>
+                    <ButtonSkip onClick={proceedToNextAgent} />
+                  </div>
+                </>
               )}
             </div>
           </div>
@@ -130,7 +141,13 @@ const UserMessage = ({ message }: { message: Message }) => {
   );
 };
 
-const BotMessage = ({ message }: { message: Message }) => {
+const BotMessage = ({
+  message,
+  agentChatter,
+}: {
+  message: Message;
+  agentChatter: boolean;
+}) => {
   return (
     <div className="flex items-start gap-3">
       <Avatar className="w-8 h-8 shrink-0">
@@ -138,7 +155,7 @@ const BotMessage = ({ message }: { message: Message }) => {
         <AvatarFallback>zee</AvatarFallback>
       </Avatar>
       <div className="bg-muted rounded-lg p-3 max-w-[80%]">
-        <p className="text-sm">
+        <p className={`text-sm ${agentChatter ? "text-muted-foreground" : ""}`}>
           <MemoizedReactMarkdown className={"prose"}>
             {message.message}
           </MemoizedReactMarkdown>

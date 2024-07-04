@@ -70,6 +70,9 @@ export default function Main() {
     });
     const data = await resp.json();
     console.log("Received session from central relay", data);
+    if (!resp.ok) {
+      throw new Error("Request to start session failed");
+    }
     return {
       relayAddress: CENTRAL_RELAY_URL,
       agentAddress: data.wsUrl,
