@@ -78,10 +78,13 @@ export function ChatComponent({
         {done && (
           <FormDownload>
             <div className="container">
-              <Button className="w-full uppercase">
-                <a href={downloadURL !== "" ? downloadURL : "#"}>
-                  Download Spec & Code
-                </a>
+              <Button
+                className="w-full uppercase"
+                onClick={() => {
+                  window.open(downloadURL, "_blank");
+                }}
+              >
+                Download Spec & Code
               </Button>
             </div>
           </FormDownload>

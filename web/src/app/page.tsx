@@ -81,9 +81,15 @@ export default function Main() {
       <Nav />
       {!ready && (
         <main className="flex h-[100vh] flex-col items-center justify-center overflow-hidden">
-          <Home setupSession={setupSession} setDelay={setDelay} />
+          <Home
+            setupSession={setupSession}
+            setDelayMilliseconds={setDelayMilliseconds}
+          />
           {!ready && loading && (
-            <SessionCountdown delay={delay} start={startCountdown} />
+            <SessionCountdown
+              delayMilliseconds={delayMilliseconds}
+              start={startCountdown}
+            />
           )}
         </main>
       )}
