@@ -12,6 +12,20 @@ export async function checkValidAccessCode(code: string): Promise<boolean> {
   return data === true;
 }
 
+export async function getUsers(): Promise<Array<User>> {
+  const users = await kv.keys("user:*");
+  const promises = users.map((user) => kv.hgetall(user));
+  const results = await Promise.all(promises);
+  return results.map((result) => {
+    return result as unknown as User;
+  });
+}
+
+export async function countUsers(): Promise<number> {
+  const users = await kv.keys("user:*");
+  return users.length;
+}
+
 /**
  * Saves user to db
  * @param user
