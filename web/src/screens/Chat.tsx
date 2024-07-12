@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 
 import "../style/Chat.css";
 import { ChatComponent } from "@/components/chat-component";
+import { PAIR_DELAY_MS, RESTART_DELAY_MS } from "@/helpers/constants";
 
 const initialStates = {
   messagesToTrack: [],
@@ -23,7 +24,7 @@ const initialStates = {
   seenAgents: new Set<string>(),
   // react states
   currentAgent: "Spec Writer",
-  messageList: [],
+  messagesToDisplay: [],
   downloadURL: "",
   loading: true,
   ready: false,
@@ -67,8 +68,8 @@ export default function Chat({
   const [downloadURL, setDownloadURL] = useState<string>(
     initialStates.downloadURL
   );
-  const [messageList, setMessageList] = useState<MT[]>(
-    initialStates.messageList
+  const [messagesToDisplay, setMessagesToDisplay] = useState<MT[]>(
+    initialStates.messagesToDisplay
   );
 
   const ws = useRef<Socket | null>(null);
@@ -90,6 +91,14 @@ export default function Chat({
     };
   }, []);
 
+  // IMPORTANT: Do not rely on React state variables for logic in
+  // these websocket handlers.
+  //
+  // The websocket handlers are only constructed once so they can not
+  // read React state correctly.
+  // For example, "currentAgent" will not be correct here.
+  //
+  // However setting React state from here works fine.
   function onOpen() {
     setLoading(false);
     console.log("connected");
@@ -103,6 +112,14 @@ export default function Chat({
     }
   }
 
+  // IMPORTANT: Do not rely on React state variables for logic in
+  // these websocket handlers.
+  //
+  // The websocket handlers are only constructed once so they can not
+  // read React state correctly.
+  // For example, "currentAgent" will not be correct here.
+  //
+  // However setting React state from here works fine.
   function requestPair() {
     console.log(
       "requestPair will start after delay: ",
@@ -110,21 +127,19 @@ export default function Chat({
       snoozeApiKey
     );
     setTimeout(() => {
-      console.log("requestPair: 30 seconds passed");
       console.log("requestPair: sending pair request to relay");
       send("snooz3-pair" + " " + agentAddress + " " + snoozeApiKey);
-      setReady(true);
-      onReady();
       setTimeout(() => {
-        console.log("requestPair: 5 seconds passed")
-        console.log(`messageList = ${messageList}`);
-        if (messageList.length === 0) {
-          console.log('messageList length === 0');
-          console.log('request restart connection to agent');
+        console.log(`requestPair messages tracked = ${messagesToTrack}`);
+        if (messagesToTrack.length === 0) {
+          console.log("request restart connection to agent");
           restart();
+        } else {
+          setReady(true);
+          onReady();
         }
-      }, 5000);
-    }, 45000);
+      }, RESTART_DELAY_MS);
+    }, PAIR_DELAY_MS);
   }
 
   // IMPORTANT: Do not rely on React state variables for logic in
@@ -151,6 +166,11 @@ export default function Chat({
     // HIDE
     // Message indicates pairing was successful
     if (data == "snooz3-pair-success") {
+      send("hi");
+      setTimeout(() => {
+        setReady(true);
+        onReady();
+      }, 1000);
       return;
     }
 
@@ -358,7 +378,7 @@ export default function Chat({
   }
 
   function displayMessage(message: MT) {
-    const lastMessageInList = messageList[messageList.length - 1];
+    const lastMessageInList = messagesToDisplay[messagesToDisplay.length - 1];
     if (lastMessageInList) {
       console.log("first", message.message);
       console.log("last", lastMessageInList.message);
@@ -369,7 +389,7 @@ export default function Chat({
     if (!message.custom && !message.fromUser) {
       receivedAndDisplayedMessages.push(message.message);
     }
-    setMessageList((prev) => [...prev, message]);
+    setMessagesToDisplay((prev) => [...prev, message]);
     if (!message.fromUser) {
       setLoading(false);
     }
@@ -379,7 +399,7 @@ export default function Chat({
     console.log("snz3 - handle enter");
     setLoading(true);
     // const message = inputRef.current?.innerText || "";
-    setMessageList((prev) => [...prev, { fromUser: true, message }]);
+    setMessagesToDisplay((prev) => [...prev, { fromUser: true, message }]);
     send(message);
     if (inputRef.current) {
       inputRef.current.innerText = "";
@@ -409,7 +429,7 @@ export default function Chat({
     setDone(initialStates.done);
     setCurrentAgent(initialStates.currentAgent);
     setDownloadURL(initialStates.downloadURL);
-    setMessageList(initialStates.messageList);
+    setMessagesToDisplay(initialStates.messagesToDisplay);
   }
 
   function send(message: string) {
@@ -418,20 +438,18 @@ export default function Chat({
     sentMessages.push(message.trim());
   }
 
-  function agentAvailable() {
-    return currentAgent == "Spec Writer";
-  }
-
   if (ready) {
     return (
       <ChatComponent
         inputRef={inputRef}
         loading={loading}
-        messages={messageList}
+        messages={messagesToDisplay}
         onSubmit={handleEnter}
         onRestart={restart}
         proceedToNextAgent={proceedToNextAgent}
         currentAgent={currentAgent}
+        done={done}
+        downloadURL={downloadURL}
       />
     );
   } else {

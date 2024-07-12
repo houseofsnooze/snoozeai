@@ -10,10 +10,13 @@ interface HomeProps {
       agentAddress: string;
     }
   ) => void;
-  setDelay: (delay: number) => void; // seconds. this is passed upstream
+  setDelayMilliseconds: (delay: number) => void; // this is passed upstream
 }
 
-export default function Home({ setupSession, setDelay }: HomeProps) {
+export default function Home({
+  setupSession,
+  setDelayMilliseconds,
+}: HomeProps) {
   const [showHeader, setShowHeader] = useState(true);
 
   return (
@@ -36,7 +39,7 @@ export default function Home({ setupSession, setDelay }: HomeProps) {
         )}
         <HomeButtons
           onSubmit={setupSession}
-          setDelay={setDelay}
+          setDelayMilliseconds={setDelayMilliseconds}
           setShowHeader={setShowHeader}
         />
       </div>

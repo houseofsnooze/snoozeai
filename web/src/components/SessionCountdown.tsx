@@ -5,15 +5,15 @@ import { useInterval } from "@/lib/useInterval";
 
 interface SessionCountdownProps {
   start: boolean;
-  delay: number; // seconds
+  delayMilliseconds: number;
   // onDone: () => void;
 }
 
 export default function SessionCountdown({
   start,
-  delay,
+  delayMilliseconds,
 }: SessionCountdownProps) {
-  const [countdown, setCountdown] = useState(delay);
+  const [countdown, setCountdown] = useState(delayMilliseconds / 1000);
   const [period, setPeriod] = useState<number | null>(null);
 
   useEffect(() => {

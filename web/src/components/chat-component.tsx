@@ -10,6 +10,7 @@ import ButtonSend from "./ButtonSend";
 import ButtonSkip from "./ButtonSkip";
 import Tooltip from "./Tooltip";
 import ChatStage from "./ChatStage";
+import FormDownload from "./FormDownload";
 
 import { Message } from "@/helpers/types";
 import InputExpandable from "./InputExpandable";
@@ -24,6 +25,8 @@ export function ChatComponent({
   onSubmit,
   proceedToNextAgent,
   currentAgent,
+  done,
+  downloadURL,
 }: {
   inputRef: React.RefObject<HTMLSpanElement>;
   loading: boolean;
@@ -32,6 +35,8 @@ export function ChatComponent({
   onSubmit: (message: string) => void;
   proceedToNextAgent: () => void;
   currentAgent: string;
+  done: boolean;
+  downloadURL: string;
 }) {
   const [input, setInput] = useState("");
   const { containerRef, messagesRef, scrollToBottom } = useScrollAnchor();
@@ -54,7 +59,11 @@ export function ChatComponent({
               m.fromUser ? (
                 <UserMessage key={i} message={m} />
               ) : (
-                <BotMessage key={i} message={m} />
+                <BotMessage
+                  key={i}
+                  message={m}
+                  agentChatter={currentAgent != AGENTS["Spec Writer"]}
+                />
               )
             )
           ) : (
@@ -70,32 +79,49 @@ export function ChatComponent({
         }}
         className="bg-background border-t border-muted px-4 py-3 sticky bottom-0 w-full"
       >
-        <div className="container">
-          <ChatStage incomingAgent={currentAgent} />
-          <div className="flex space-x-2">
-            {/* <button>
-              <ButtonTrash onClick={onRestart} />
-            </button> */}
-            <div className="relative w-full">
-              <Textarea
-                placeholder="Enter a reply..."
-                disabled={loading}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-              />
+        {done && (
+          <FormDownload>
+            <div className="container">
+              <Button
+                className="w-full uppercase"
+                onClick={() => {
+                  window.open(downloadURL, "_blank");
+                }}
+              >
+                Download Spec & Code
+              </Button>
             </div>
-            <div>
-              <ButtonSend onClick={handleSubmit} loading={loading} />
+          </FormDownload>
+        )}
+        {!done && (
+          <div className="container">
+            <ChatStage incomingAgent={currentAgent} />
+            <div className="flex space-x-2">
+              <div className="relative w-full">
+                <Textarea
+                  placeholder={
+                    currentAgent != AGENTS["Spec Writer"]
+                      ? "The agents are talking to each other! Feel free to take a nap while they finish up."
+                      : "Enter a reply..."
+                  }
+                  disabled={loading || currentAgent != AGENTS["Spec Writer"]}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                />
+              </div>
+              {currentAgent === AGENTS["Spec Writer"] && (
+                <>
+                  <div>
+                    <ButtonSend onClick={handleSubmit} loading={loading} />
+                  </div>
+                  <div>
+                    <ButtonSkip onClick={proceedToNextAgent} />
+                  </div>
+                </>
+              )}
             </div>
-            {
-              currentAgent === AGENTS["Spec Writer"] && (
-            <div>
-              <ButtonSkip onClick={proceedToNextAgent} />
-            </div>
-              )
-            }
           </div>
-        </div>
+        )}
       </form>
     </div>
   );
@@ -115,7 +141,13 @@ const UserMessage = ({ message }: { message: Message }) => {
   );
 };
 
-const BotMessage = ({ message }: { message: Message }) => {
+const BotMessage = ({
+  message,
+  agentChatter,
+}: {
+  message: Message;
+  agentChatter: boolean;
+}) => {
   return (
     <div className="flex items-start gap-3">
       <Avatar className="w-8 h-8 shrink-0">
@@ -123,7 +155,7 @@ const BotMessage = ({ message }: { message: Message }) => {
         <AvatarFallback>zee</AvatarFallback>
       </Avatar>
       <div className="bg-muted rounded-lg p-3 max-w-[80%]">
-        <p className="text-sm">
+        <p className={`text-sm ${agentChatter ? "text-muted-foreground" : ""}`}>
           <MemoizedReactMarkdown className={"prose"}>
             {message.message}
           </MemoizedReactMarkdown>

@@ -4,6 +4,7 @@ import FormHomeConfig from "./FormHomeConfig";
 import FormHomeStart from "./FormHomeStart";
 import LoadingSpinner from "./LoadingSpinner";
 import * as api from "../lib/api";
+import { CONFIG_STARTUP_DELAY_MS, STARTUP_DELAY_MS } from "@/helpers/constants";
 
 interface HomeButtonsProps {
   onSubmit: (
@@ -13,13 +14,13 @@ interface HomeButtonsProps {
       agentAddress: string;
     }
   ) => void;
-  setDelay: (delay: number) => void; // seconds
+  setDelayMilliseconds: (delay: number) => void;
   setShowHeader: (show: boolean) => void;
 }
 
 export default function HomeButtons({
   onSubmit,
-  setDelay,
+  setDelayMilliseconds,
   setShowHeader,
 }: HomeButtonsProps) {
   const [loading, setLoading] = useState(false);
@@ -60,7 +61,7 @@ export default function HomeButtons({
       alert("Invalid access code");
       return;
     }
-    setDelay(90); // seconds
+    setDelayMilliseconds(STARTUP_DELAY_MS);
     setShowStartInput(false);
     onSubmit(accessCode);
   }
@@ -83,7 +84,7 @@ export default function HomeButtons({
     accessCode: string
   ) {
     setLoading(true);
-    setDelay(30); // seconds
+    setDelayMilliseconds(CONFIG_STARTUP_DELAY_MS);
     setShowConfigInput(false);
     if (window.location.hostname !== "localhost") {
       const valid = await api.checkValidAccessCode(accessCode);

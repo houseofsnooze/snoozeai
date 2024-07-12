@@ -12,6 +12,7 @@ import startAgentSession from './startAgentSession';
 import { logger } from 'express-winston';
 import winston from 'winston';
 import WebSocket, { MessageEvent, ErrorEvent, Event } from 'ws';
+import startAgentTasks from './startAgentTasks';
 
 const WS_PORT = 8000;
 
@@ -27,6 +28,7 @@ const agentToClient = new Map<string, string>();
 function main() {
     const app = express();
     app.use(cors());
+    app.use(express.json());
     app.use(logger({
         transports: [
             new winston.transports.Console()
@@ -42,22 +44,45 @@ function main() {
     });
 
     app.get('/healthcheck', (req: Request, res: Response) => res.send('Alive!'));
-    app.post('/start', async (req: Request, res: Response) => {
-        console.log('Starting agent session...');
-        const session = await startAgentSession();
-        if (!session) {
-            res.status(500).send('Failed to start agent session');
+    app.post('/snooze-admin', async (req: Request, res: Response) => {
+        try {
+            if (req.body.command === "startTask") {
+                const tasks = await startAgentTasks(req.body.count);
+                res.send(tasks);
+                return;
+            } else {
+                res.status(400).send('unknown command');
+                return;
+            }
+        } catch (error) {
+            console.error('Error', error);
+            res.status(500).send({ error: 'Failed' });
             return;
         }
-        const { wsUrl, taskId } = session;
-        connectToAgent(wsUrl);
-        const ip = wsUrl.split('ws://')[1].split(':')[0];
-        setTimeout(
-            () => postToAgent(ip, 'taskid', JSON.stringify({ "taskid": taskId })),
-            30000
-        )
-        res.send({ taskId, wsUrl });
-        return;
+    });
+    app.post('/start', async (req: Request, res: Response) => {
+        try {
+            const userId = req.body.userId;
+            console.log(`Starting agent session for user: ${userId}`);
+            const session = await startAgentSession(userId);
+            if (!session) {
+                res.status(500).send({ error: 'Failed to start agent session' });
+                return;
+            }
+            const { wsUrl, taskId } = session;
+            connectToAgent(wsUrl);
+            const ip = wsUrl.split('ws://')[1].split(':')[0];
+            setTimeout(
+                () => postToAgent(ip, 'taskid', JSON.stringify({ "taskid": taskId })),
+                30000
+            );
+            res.send({ taskId, wsUrl });
+            return;
+        } catch (error) {
+            console.error('Error starting agent session', error);
+            res.status(500).send({ error: 'Failed to start agent session' });
+            return;
+        }
     });
     // TODO: come back to this to clean up ecs tasks
     // app.post('/end', async (req: Request, res: Response) => {
@@ -83,16 +108,23 @@ main();
 async function postToAgent(ip: string, path: string, payload: string, port: number = 8080) {
     const url = `http://${ip}:${port}/${path}`;
     console.log(`postToAgent - POST to agent: ${url} with payload ${payload}`);
-    await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: payload,
-    })
-        .then(resp => resp.json())
-        .then(data => { console.log('response from POST to agent: ', data); })
-        .catch((error) => { console.error('error from POST to agent', error); });
+    try {
+        const resp = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: payload,
+        });
+        if (!resp.ok) {
+            console.error('not ok from POST to agent');
+        } else {
+            const data = await resp.json();
+            console.log('response from POST to agent: ', data);
+        }
+    } catch (error) {
+        console.error('error from POST to agent', error);
+    }
 }
 
 // Handles connections from clients
@@ -119,7 +151,9 @@ async function handleClientConnection(websocket: Socket) {
             // agentWsUrl: ws://172.17.0.2:1337
             const ip = agentWsUrl.split('ws://')[1].split(':')[0];
             const payload = JSON.stringify({ apikey });
-            await postToAgent(ip, 'apikey', payload);
+
+            // let this run in bg instead of awaiting
+            postToAgent(ip, 'apikey', payload);
 
             // pairing agent
             console.log("Pairing to agent...")
