@@ -2,8 +2,13 @@ import { Bot, Context } from "https://deno.land/x/grammy@v1.23.0/mod.ts";
 import * as db from "../db.ts";
 
 export async function issueAccessCode(bot: Bot, ctx: Context) {
+    const alias = JSON.stringify(ctx.match);
+
     const name = ctx.from?.first_name || "stranger";
-    const username = ctx.from?.username || "stranger";
+    let username = ctx.from?.username || "stranger";
+    if (alias) {
+        username = alias;
+    }
     const id = ctx.from?.id;
     if (!id) {
         console.log("No user id found");
