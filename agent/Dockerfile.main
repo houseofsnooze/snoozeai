@@ -16,7 +16,7 @@ COPY . .
 # Install any needed packages specified in requirements.txt and package.json
 # RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install -r requirements.txt
-RUN pip install "uvicorn[standard]" websockets "pyautogen[websockets]"
+RUN pip install "uvicorn[standard]" websockets "ag2[websockets]"
 
 EXPOSE 8080
 EXPOSE 1337
